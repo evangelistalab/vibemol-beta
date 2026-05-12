@@ -1,0 +1,1163 @@
+#editToolbox {
+  display: none !important;
+}
+
+#editAddPane {
+  display: none;
+  margin-top: 8px;
+  border-top: 1px solid var(--vm-color-border-strong);
+  padding-top: 8px;
+}
+
+#editAddPane.active {
+  display: block;
+}
+
+#editSelectionTranslateCue {
+  position: fixed;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 34;
+}
+
+#editSelectionTranslateCue[aria-hidden="false"] {
+  display: flex;
+}
+
+#editSelectionTranslateCue .material-symbols-rounded {
+  font-size: var(--vm-text-xl);
+  font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 24;
+}
+
+.editSelectionCueButton {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--vm-color-border-control);
+  background: var(--vm-color-surface-control);
+  color: var(--vm-color-on-control);
+  box-shadow: var(--vm-shadow-control);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  pointer-events: auto;
+  cursor: pointer;
+  position: relative;
+}
+
+.editSelectionCueButton:hover {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 58%, var(--vm-color-border-control));
+  background: color-mix(in srgb, var(--vm-brand-accent) 10%, var(--vm-color-surface-control));
+}
+
+.editSelectionCueButton.is-active {
+  border-color: var(--vm-brand-accent);
+  background: color-mix(in srgb, var(--vm-brand-accent) 18%, var(--vm-color-surface-control));
+  color: var(--vm-color-on-control);
+  box-shadow: var(--vm-shadow-control), 0 0 0 4px color-mix(in srgb, var(--vm-brand-accent) 18%, transparent);
+}
+
+.editSelectionCueButton[hidden] {
+  display: none !important;
+}
+
+.editSelectionCueButton.is-muted {
+  color: var(--vm-color-on-control-dim);
+  opacity: 0.82;
+}
+
+.editSelectionCueButton.is-delete {
+  border-color: color-mix(in srgb, #ff7e7e 58%, var(--vm-color-border-control));
+  background: color-mix(in srgb, #7b2f3b 55%, var(--vm-color-surface-control));
+  color: #ffecef;
+}
+
+.editSelectionCueButton.is-delete:hover {
+  border-color: rgba(255, 157, 157, 0.82);
+  background: color-mix(in srgb, #923947 68%, var(--vm-color-surface-control));
+}
+
+.editSelectionCueButton[data-bond-order]:not([data-bond-order=""])::after {
+  content: attr(data-bond-order);
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--vm-color-surface-raised);
+  color: var(--vm-color-on-raised);
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  line-height: 18px;
+  box-shadow: 0 4px 10px rgba(8, 16, 28, 0.28);
+}
+
+#editSelectionCoordinationCuePopover,
+#editSelectionMetalBondingCuePopover {
+  position: fixed;
+  z-index: 35;
+  display: none;
+  width: min(360px, calc(100vw - 24px));
+  padding: 12px;
+  border: 1px solid var(--vm-color-border-subtle);
+  border-radius: 16px;
+  background: var(--vm-color-surface-raised);
+  box-shadow: var(--vm-shadow-lg);
+}
+
+#editSelectionCoordinationCuePopover[aria-hidden="false"],
+#editSelectionMetalBondingCuePopover[aria-hidden="false"] {
+  display: block;
+}
+
+.editCoordinationCueHeader {
+  margin: 0 0 10px;
+  font-size: var(--vm-text-sm);
+  font-weight: var(--vm-font-weight-heading);
+  color: var(--vm-color-text-primary);
+}
+
+.editCoordinationCueHeaderSubtext {
+  margin: -4px 0 10px;
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-strong);
+  color: var(--vm-color-text-secondary);
+}
+
+.editCoordinationCueGrid {
+  display: grid;
+  gap: 10px;
+}
+
+.editCoordinationCueOption {
+  appearance: none;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--vm-color-border-control);
+  border-radius: 14px;
+  background: var(--vm-color-surface-control);
+  color: var(--vm-color-on-control);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--vm-shadow-control);
+}
+
+.editCoordinationCueOption:hover {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 42%, var(--vm-color-border-control));
+  background: color-mix(in srgb, var(--vm-brand-accent) 8%, var(--vm-color-surface-control));
+}
+
+.editCoordinationCueOption.is-active {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 76%, transparent);
+  background: color-mix(in srgb, var(--vm-brand-accent) 20%, var(--vm-color-surface-control));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vm-brand-accent) 16%, transparent);
+}
+
+.editCoordinationCuePreview {
+  width: 96px;
+  height: 78px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: radial-gradient(circle at 50% 42%, rgba(86, 96, 116, 0.34), rgba(32, 37, 44, 0.08) 72%, rgba(32, 37, 44, 0));
+}
+
+.editCoordinationCuePreview canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.editCoordinationCueMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.editCoordinationCueLabel {
+  font-size: var(--vm-text-base);
+  font-weight: var(--vm-font-weight-heading);
+  color: var(--vm-color-on-control);
+}
+
+.editCoordinationCueSubtext {
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-strong);
+  color: var(--vm-color-on-control-dim);
+}
+
+.adaptiveEditItem {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: fit-content;
+  min-width: 188px;
+  max-width: min(260px, calc(100vw - 24px));
+  padding: 6px 8px;
+  border: 1px solid var(--vm-color-border-control);
+  border-radius: 12px;
+  background: var(--vm-color-surface-control);
+  box-shadow: var(--vm-shadow-control);
+  color: var(--vm-color-on-control);
+  cursor: pointer;
+  text-align: left;
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+}
+
+.adaptiveEditItem[hidden],
+.adaptiveEditItem[aria-hidden="true"] {
+  display: none !important;
+}
+
+.adaptiveEditItem:hover {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 26%, var(--vm-color-border-control));
+  background: color-mix(in srgb, var(--vm-brand-accent) 8%, var(--vm-color-surface-control));
+}
+
+.adaptiveEditItem.active {
+  border-color: var(--vm-brand-accent);
+  background: color-mix(in srgb, var(--vm-brand-accent) 18%, var(--vm-color-surface-control));
+  box-shadow: var(--vm-shadow-control);
+}
+
+.adaptiveEditItem[data-static="true"] {
+  cursor: default;
+}
+
+.adaptiveEditItem[data-static="true"]:hover {
+  border-color: var(--vm-color-border-control);
+  background: var(--vm-color-surface-control);
+}
+
+:root[data-theme='dark'] .adaptiveEditItem {
+  background: rgb(22, 29, 42);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme='dark'] .adaptiveEditItem:hover {
+  border-color: color-mix(in srgb, var(--vm-color-accent) 26%, rgba(255, 255, 255, 0.12));
+  background: color-mix(in srgb, var(--vm-color-accent) 8%, rgb(22, 29, 42));
+}
+
+:root[data-theme='dark'] .adaptiveEditItem.active {
+  border-color: var(--vm-color-accent);
+  background: color-mix(in srgb, var(--vm-color-accent) 18%, rgb(22, 29, 42));
+}
+
+#editAdaptiveAddAtomPopover,
+#editAdaptiveSymmetryPopover,
+#editSelectionFragmentCuePopover {
+  position: fixed;
+  display: none;
+  width: min(360px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border: 1px solid var(--vm-color-border-subtle);
+  border-radius: 12px;
+  background: var(--vm-color-surface-raised);
+  box-shadow: var(--vm-shadow-lg);
+  z-index: 35;
+}
+
+#editAdaptiveAddAtomPopover[aria-hidden="false"],
+#editAdaptiveSymmetryPopover[aria-hidden="false"],
+#editSelectionFragmentCuePopover[aria-hidden="false"] {
+  display: block;
+}
+
+#editSelectionMarquee {
+  position: fixed;
+  display: none;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border: 1px solid color-mix(in srgb, var(--vm-brand-accent) 90%, transparent);
+  background: color-mix(in srgb, var(--vm-brand-accent) 14%, transparent);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  z-index: 35;
+}
+
+#editSelectionMarquee[aria-hidden="false"] {
+  display: block;
+}
+
+#bondOrderPopup {
+  position: fixed;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--vm-color-border-subtle);
+  border-radius: 14px;
+  background: var(--vm-color-surface-raised);
+  box-shadow: var(--vm-shadow-lg);
+  color: var(--vm-color-text-primary);
+  z-index: 36;
+  pointer-events: auto;
+}
+
+#bondOrderPopup[aria-hidden="false"] {
+  display: flex;
+}
+
+#bondOrderPopupTitle {
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  color: var(--vm-color-text-primary);
+}
+
+#bondOrderPopupButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#bondOrderPopupButtons button {
+  appearance: none;
+  border: 1px solid var(--vm-color-border-control);
+  width: auto;
+  height: 22px;
+  min-width: 22px;
+  padding: 0 10px;
+  background: var(--vm-color-surface-control);
+  color: var(--vm-color-on-control);
+  border-radius: 999px;
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+#bondOrderPopupButtons button:hover {
+  background: color-mix(in srgb, var(--vm-brand-accent) 8%, var(--vm-color-surface-control));
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 64%, transparent);
+}
+
+#bondOrderPopupButtons button.active {
+  background: color-mix(in srgb, var(--vm-brand-accent) 18%, var(--vm-color-surface-control));
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 96%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--vm-brand-accent) 28%, transparent);
+}
+
+#editAddAtomOperatorPanel,
+#editAddMoleculeOperatorPanel {
+  position: fixed;
+  right: 16px;
+  bottom: 24px;
+  display: none;
+  width: min(340px, calc(100vw - 24px));
+  border: 1px solid var(--vm-color-border-control);
+  border-radius: 12px;
+  background: var(--vm-color-surface-control);
+  color: var(--vm-color-on-control);
+  box-shadow: var(--vm-shadow-control);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  z-index: 35;
+  overflow: hidden;
+}
+
+#editAddAtomOperatorPanel[aria-hidden="false"],
+#editAddMoleculeOperatorPanel[aria-hidden="false"] {
+  display: block;
+}
+
+#editAddAtomOperatorHeader,
+#editAddMoleculeOperatorHeader {
+  appearance: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--vm-color-on-control);
+  cursor: pointer;
+  text-align: left;
+}
+
+#editAddAtomOperatorHeader:hover,
+#editAddMoleculeOperatorHeader:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.editAddAtomOperatorTitle,
+.editAddMoleculeOperatorTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.editAddAtomOperatorChevron,
+.editAddMoleculeOperatorChevron {
+  font-size: var(--vm-text-sm);
+  color: var(--vm-color-on-control-dim);
+  width: 12px;
+  flex: 0 0 auto;
+}
+
+.editAddAtomOperatorLabel,
+.editAddMoleculeOperatorLabel {
+  font-size: var(--vm-text-base);
+  font-weight: var(--vm-font-weight-heading);
+  line-height: 1.1;
+  color: var(--vm-color-on-control);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#editAddAtomOperatorBody,
+#editAddMoleculeOperatorBody {
+  display: grid;
+  grid-template-columns: auto max-content;
+  gap: 8px 10px;
+  padding: 0 12px 12px;
+  align-items: center;
+}
+
+#editAddMoleculeOperatorBody {
+  column-gap: 6px;
+}
+
+#editAddAtomOperatorPanel[data-collapsed="true"] #editAddAtomOperatorBody,
+#editAddMoleculeOperatorPanel[data-collapsed="true"] #editAddMoleculeOperatorBody {
+  display: none;
+}
+
+.editAddAtomOperatorRowLabel {
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  color: rgba(214, 221, 233, 0.78);
+  text-align: left;
+  min-width: 52px;
+}
+
+.editAddAtomOperatorCoord {
+  width: 84px;
+  min-width: 84px;
+  border: 1px solid var(--vm-color-border-control);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--vm-color-surface-control) 78%, var(--vm-color-surface-panel));
+  color: var(--vm-color-on-control);
+  padding: 6px 8px;
+  font-size: var(--vm-text-sm);
+  font-weight: var(--vm-font-weight-strong);
+}
+
+.editAddAtomOperatorCoord:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 72%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--vm-brand-accent) 18%, transparent);
+}
+
+.editAddAtomOperatorFoot {
+  grid-column: 1 / -1;
+  font-size: 10px;
+  font-weight: var(--vm-font-weight-strong);
+  color: rgba(214, 221, 233, 0.72);
+  padding-top: 2px;
+}
+
+.editAddMoleculeOperatorButtonRow {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.editAddMoleculeOperatorButtonLabel {
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  color: rgba(214, 221, 233, 0.78);
+  white-space: nowrap;
+  margin-right: 2px;
+}
+
+.editAddMoleculeOperatorButtonRow button {
+  appearance: none;
+  flex: 0 0 auto;
+  border: 1px solid var(--vm-color-border-control);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--vm-color-surface-control) 78%, var(--vm-color-surface-panel));
+  color: var(--vm-color-on-control);
+  min-width: 24px;
+  padding: 6px 0;
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  cursor: pointer;
+}
+
+.editAddMoleculeOperatorButtonRow button:hover {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 48%, var(--vm-color-border-control));
+  background: color-mix(in srgb, var(--vm-brand-accent) 18%, var(--vm-color-surface-control));
+}
+
+#editAdaptiveAddAtomPopover #editAddAtomPane,
+#editAdaptiveAddAtomPopover #editAddFragmentPane,
+#editAdaptiveAddAtomPopover #editAddMoleculePane,
+#editSelectionFragmentCuePopover #editAddFragmentPane {
+  display: block;
+}
+
+#editAdaptiveAddAtomPopover label:first-child,
+#editSelectionFragmentCuePopover label:first-child {
+  margin-top: 0;
+}
+
+#editBuildPalette {
+  display: grid;
+  gap: 14px;
+}
+
+#editAdaptiveSymmetryPopover {
+  width: min(220px, calc(100vw - 24px));
+}
+
+#editSymmetryPanel {
+  display: grid;
+  gap: 12px;
+}
+
+#editSymmetryHeader {
+  display: grid;
+  gap: 10px;
+}
+
+#editSymmetryTitleRow {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.editSymmetryTitleIcon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--vm-brand-accent) 16%, transparent);
+  color: color-mix(in srgb, var(--vm-brand-accent) 72%, white);
+  font-size: var(--vm-text-lg);
+}
+
+#editSymmetryHeaderText {
+  display: grid;
+  gap: 3px;
+}
+
+#editSymmetryTitle {
+  font-size: var(--vm-text-base);
+  font-weight: var(--vm-font-weight-heading);
+  color: var(--vm-color-on-raised);
+}
+
+#editSymmetryTargetSummary {
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  color: rgba(214, 221, 233, 0.84);
+  font-variant-numeric: tabular-nums;
+}
+
+#editSymmetryExactResultCard {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 9px 10px;
+  border: 1px solid rgba(117, 129, 150, 0.2);
+  border-radius: 12px;
+  background: rgba(17, 24, 39, 0.62);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+#editSymmetryExactResultCard.is-updated {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 88%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--vm-brand-accent) 22%, rgba(31, 52, 88, 0.94)),
+    color-mix(in srgb, var(--vm-brand-accent) 18%, rgba(22, 35, 58, 0.94))
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--vm-brand-accent) 20%, white),
+    0 0 0 1px color-mix(in srgb, var(--vm-brand-accent) 18%, transparent),
+    0 8px 20px rgba(18, 43, 86, 0.24);
+  transform: translateY(-1px);
+}
+
+#editSymmetryExactResultCard.is-updated .editSymmetryInlineIcon,
+#editSymmetryExactResultCard.is-updated #editSymmetryExactResult {
+  color: var(--vm-color-on-control);
+}
+
+.editSymmetryInlineIcon,
+#editSymmetryExactResult {
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  color: rgba(214, 221, 233, 0.84);
+}
+
+#editSymmetryExactResult {
+  font-variant-numeric: tabular-nums;
+}
+
+.editSymmetryInlineIcon {
+  color: color-mix(in srgb, var(--vm-brand-accent) 72%, white);
+}
+
+#editSymmetryToleranceSection,
+.editSymmetryCandidateSection,
+#editSymmetryElementSection {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(117, 129, 150, 0.18);
+  border-radius: 12px;
+  background: rgba(17, 24, 39, 0.38);
+}
+
+.editSymmetryCandidateSection {
+  display: grid;
+  gap: 8px;
+}
+
+#editSymmetryToleranceLabel,
+.editSymmetryCandidateSectionTitle,
+#editSymmetryElementLabel {
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vm-color-text-label);
+}
+
+#editSymmetryToleranceControls {
+  display: block;
+}
+
+#editSymmetryCandidates {
+  display: grid;
+  gap: 4px;
+  max-height: min(40vh, 280px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.editSymmetryCandidateBtn {
+  appearance: none;
+  width: 100%;
+  border: 1px solid rgba(117, 129, 150, 0.28);
+  border-radius: 10px;
+  padding: 4px 8px;
+  background: linear-gradient(180deg, rgba(23, 31, 46, 0.92), rgba(17, 24, 39, 0.88));
+  color: var(--vm-color-on-control);
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.editSymmetryCandidateBtn:hover {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 64%, transparent);
+  background: linear-gradient(180deg, rgba(30, 40, 58, 0.96), rgba(24, 33, 51, 0.94));
+}
+
+.editSymmetryCandidateBtn.is-current {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 82%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--vm-brand-accent) 18%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--vm-brand-accent) 12%, transparent);
+}
+
+.editSymmetryCandidateBtn.is-active {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 96%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--vm-brand-accent) 28%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--vm-brand-accent) 18%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--vm-brand-accent) 18%, rgba(31, 46, 72, 0.98)),
+    rgba(24, 33, 51, 0.98)
+  );
+}
+
+.editSymmetryCandidateIcon {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--vm-brand-accent) 14%, transparent);
+  color: color-mix(in srgb, var(--vm-brand-accent) 72%, white);
+  font-size: var(--vm-text-xs);
+}
+
+.editSymmetryCandidateBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  min-width: 0;
+}
+
+.editSymmetryCandidateLabel {
+  font-size: var(--vm-text-sm);
+  font-weight: var(--vm-font-weight-heading);
+  color: var(--vm-color-on-control);
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.editSymmetryCandidateMetrics {
+  display: flex;
+  gap: 0;
+  justify-content: flex-end;
+  min-width: max-content;
+}
+
+.editSymmetryCandidateMeta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 14px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  font-family: var(--vm-font-mono);
+  font-size: 9px;
+  font-weight: var(--vm-font-weight-heading);
+  color: rgba(227, 233, 244, 0.8);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.editSymmetryEmptyState {
+  padding: 10px;
+  border: 1px dashed rgba(117, 129, 150, 0.28);
+  border-radius: 10px;
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-strong);
+  color: rgba(214, 221, 233, 0.76);
+}
+
+#editSymmetryFooter {
+  display: grid;
+  gap: 8px;
+}
+
+#editSymmetryFooterSecondary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.editSymmetryActionBtn {
+  appearance: none;
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid rgba(117, 129, 150, 0.28);
+  border-radius: 12px;
+  padding: 9px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(180deg, rgba(25, 32, 45, 0.94), rgba(17, 24, 39, 0.9));
+  color: var(--vm-color-on-control);
+  font-size: var(--vm-text-xs);
+  font-weight: var(--vm-font-weight-heading);
+  cursor: pointer;
+}
+
+.editSymmetryActionBtn .material-symbols-rounded {
+  font-size: 16px;
+}
+
+.editSymmetryActionBtn:hover:not([disabled]) {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 56%, transparent);
+  background: linear-gradient(180deg, rgba(31, 40, 58, 0.96), rgba(22, 30, 44, 0.94));
+}
+
+.editSymmetryActionBtn.is-primary {
+  border-color: color-mix(in srgb, var(--vm-brand-accent) 72%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--vm-brand-accent) 84%, white),
+    color-mix(in srgb, var(--vm-brand-accent) 78%, black)
+  );
+  color: var(--vm-color-text-on-accent);
+}
+
+.editSymmetryActionBtn.is-primary:hover:not([disabled]) {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--vm-brand-accent) 88%, white),
+    color-mix(in srgb, var(--vm-brand-accent) 82%, black)
+  );
+}
+
+.editSymmetryActionBtn[disabled] {
+  opacity: 0.55;
+  cursor: default;
+}
+
+#editBuildSearchLabel {
+  display: block;
+  margin: 0;
+}
+
+#editBuildSearchRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+#editBuildSearch {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--vm-color-border-soft);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: var(--vm-color-surface-chip-strong);
+  color: var(--vm-color-text-primary);
+}
+
+#editBuildSearchShortcut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 9px;
+  border: 1px solid rgba(166, 176, 191, 0.2);
+  background: rgba(187, 195, 208, 0.14);
+  color: rgba(221, 227, 236, 0.82);
+  font-size: var(--vm-text-sm);
+  font-weight: var(--vm-font-weight-heading);
+}
+
+.editBuildPaletteSection {
+  display: grid;
+  gap: 8px;
+}
+
+.editBuildPaletteSectionTitle {
+  margin: 0;
+}
+
+#editBuildAtomsHost,
+#editBuildFragmentsHost,
+#editBuildMoleculesHost {
+  display: grid;
+  gap: 8px;
+}
+
+#editBuildAtomsHost #editAddSearch,
+#editBuildAtomsHost label[for="editAddSearch"],
+#editBuildFragmentsHost #editFragmentSearch,
+#editBuildFragmentsHost label[for="editFragmentSearch"],
+#editBuildMoleculesHost #editMoleculeSearch,
+#editBuildMoleculesHost label[for="editMoleculeSearch"] {
+  display: none;
+}
+
+#editBuildAtomsHost #editAddAtomPane,
+#editBuildFragmentsHost #editAddFragmentPane,
+#editBuildMoleculesHost #editAddMoleculePane {
+  display: block;
+}
+
+.adaptiveEditItemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.adaptiveEditItemTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.adaptiveEditItemIcon {
+  flex: 0 0 auto;
+  font-size: var(--vm-text-lg);
+  line-height: 1;
+  color: var(--vm-color-on-control-dim);
+}
+
+.adaptiveEditItemLabel {
+  font-size: var(--vm-text-sm);
+  font-weight: var(--vm-font-weight-heading);
+  line-height: 1.1;
+  color: var(--vm-color-on-control);
+  white-space: nowrap;
+}
+
+.adaptiveEditItemMeta {
+  font-size: 10px;
+  font-weight: var(--vm-font-weight-strong);
+  line-height: 1.25;
+  color: var(--vm-color-on-control-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adaptiveEditItemMeta:empty {
+  display: none;
+}
+
+.adaptiveShortcutGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+
+.adaptiveShortcutKey {
+  height: 24px;
+}
+
+#editAddModeToggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+#editAddModeToggle button {
+  appearance: none;
+  border: 1px solid var(--vm-color-border-soft);
+  background: var(--vm-color-surface-panel);
+  color: var(--vm-color-text-primary);
+  border-radius: 8px;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-weight: var(--vm-font-weight-heading);
+  font-size: var(--vm-text-sm);
+}
+
+#editAddModeToggle button.active {
+  border-color: var(--vm-color-accent-primary);
+  background: var(--vm-color-accent-primary-soft);
+  color: var(--vm-color-text-on-accent);
+}
+
+#editAddAtomPane,
+#editAddFragmentPane,
+#editAddMoleculePane {
+  display: none;
+}
+
+#editAddAtomPane.active,
+#editAddFragmentPane.active,
+#editAddMoleculePane.active {
+  display: block;
+}
+
+#editAddPane label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+#editAddSearch {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--vm-color-border-soft);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--vm-color-surface-chip-strong);
+  color: var(--vm-color-text-primary);
+}
+
+.editAddToggleRow {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+  margin-bottom: 0 !important;
+  color: var(--vm-color-text-secondary) !important;
+}
+
+.editAddToggleRow input[type="checkbox"] {
+  margin: 0;
+}
+
+#editFragmentSearch {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--vm-color-border-soft);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--vm-color-surface-chip-strong);
+  color: var(--vm-color-text-primary);
+}
+
+#editMoleculeSearch {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--vm-color-border-soft);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--vm-color-surface-chip-strong);
+  color: var(--vm-color-text-primary);
+}
+
+.editPopupSelect {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--vm-color-border-soft);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: var(--vm-color-surface-chip-strong);
+  color: var(--vm-color-text-primary);
+}
+
+#editAddQuick,
+#editFragmentQuick,
+#editMoleculeQuick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+#editAddQuick button,
+#editFragmentQuick button,
+#editMoleculeQuick button {
+  appearance: none;
+  border: 1px solid var(--vm-color-border-soft);
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: var(--vm-text-sm);
+  font-weight: var(--vm-font-weight-heading);
+  background: var(--vm-color-surface-panel);
+  color: var(--vm-color-text-primary);
+  cursor: pointer;
+}
+
+#editAddQuick button.active,
+#editFragmentQuick button.active,
+#editMoleculeQuick button.active {
+  border-width: 2px;
+  border-color: var(--vm-color-accent-primary);
+  background: var(--vm-color-surface-panel);
+  color: var(--vm-color-text-primary);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--vm-brand-accent) 28%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--vm-brand-accent) 40%, transparent) inset;
+}
+
+#editFragmentQuick button,
+#editMoleculeQuick button,
+#editFragmentQuick button.active,
+#editMoleculeQuick button.active {
+  color: var(--vm-color-text-primary);
+}
+
+#editAddQuick button.search-active,
+#editFragmentQuick button.search-active,
+#editMoleculeQuick button.search-active {
+  border-width: 2px;
+  border-color: rgba(196, 221, 255, 0.84);
+  background: rgba(77, 100, 135, 0.95);
+  color: var(--vm-color-on-control);
+  box-shadow:
+    0 0 0 3px rgba(150, 195, 255, 0.24),
+    0 0 0 1px rgba(150, 195, 255, 0.36) inset,
+    0 10px 18px rgba(18, 36, 68, 0.22);
+  transform: translateY(-1px);
+}
+
+#editAdaptiveAddAtomPopover.is-search-navigating #editAddQuick button.active:not(.search-active),
+#editAdaptiveAddAtomPopover.is-search-navigating #editFragmentQuick button.active:not(.search-active),
+#editAdaptiveAddAtomPopover.is-search-navigating #editMoleculeQuick button.active:not(.search-active) {
+  border-width: 1px;
+  border-color: var(--vm-color-border-soft);
+  box-shadow: none;
+}
+
+#editTransformCurrent {
+  margin-top: 7px;
+  font-size: var(--vm-text-sm);
+  color: var(--vm-color-text-secondary);
+  min-height: 1.4em;
+}
+
+#editMoleculeAlign {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+#editMoleculeAlign button {
+  appearance: none;
+  border: 1px solid var(--vm-color-border-soft);
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: var(--vm-text-sm);
+  font-weight: var(--vm-font-weight-heading);
+  background: var(--vm-color-surface-panel);
+  color: var(--vm-color-text-primary);
+  cursor: pointer;
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+#editSnapPane {
+  margin-top: 8px;
+  border-top: 1px solid var(--vm-color-border-strong);
+  padding-top: 8px;
+}
+
+#editSnapPane .title {
+  display: block;
+  font-size: var(--vm-text-sm);
+  color: var(--vm-color-on-control-dim);
+  margin-bottom: 5px;
+  font-weight: var(--vm-font-weight-heading);
+}
+
+#editSnapHint {
+  margin-top: 5px;
+  font-size: var(--vm-text-xs);
+  color: var(--vm-color-on-control-dim);
+}
