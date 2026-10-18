@@ -1,0 +1,134 @@
+from __future__ import annotations
+
+import contextlib
+import http.client
+import pathlib
+import re
+import socket
+import subprocess
+import sys
+import time
+from typing import Iterator
+
+
+def read_app_version() -> str:
+    root = pathlib.Path(__file__).resolve().parents[2]
+    source = (root / 'assets/app/js/asset-urls.js').read_text()
+    return re.search(r"const APP_VERSION = '([^']+)';", source).group(1)
+
+
+def find_free_port() -> int:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        sock.listen(1)
+        return int(sock.getsockname()[1])
+
+
+@contextlib.contextmanager
+def run_http_server(root: pathlib.Path) -> Iterator[str]:
+    port = find_free_port()
+    process = subprocess.Popen(
+        [sys.executable, "-m", "http.server", str(port), "--bind", "127.0.0.1"],
+        cwd=str(root),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    base_url = f"http://127.0.0.1:{port}/"
+    deadline = time.time() + 15.0
+    try:
+        while time.time() < deadline:
+            try:
+                conn = http.client.HTTPConnection("127.0.0.1", port, timeout=0.5)
+                conn.request("GET", "/")
+                response = conn.getresponse()
+                response.read()
+                if response.status < 500:
+                    break
+            except OSError:
+                time.sleep(0.1)
+            finally:
+                with contextlib.suppress(Exception):
+                    conn.close()  # type: ignore[name-defined]
+        else:
+            raise RuntimeError(f"Timed out waiting for local server at {base_url}")
+        yield base_url
+    finally:
+        process.terminate()
+        with contextlib.suppress(subprocess.TimeoutExpired):
+            process.wait(timeout=5)
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)
+
+
+def ensure_artifact_dir(root: pathlib.Path) -> pathlib.Path:
+    root.mkdir(parents=True, exist_ok=True)
+    return root
+
+
+def wait_for_presented_state(page, predicate: str, *, timeout=None) -> None:
+    """Poll app state after presentation, using Stage 0's two-frame boundary.
+
+    The app renders in requestAnimationFrame. The second callback observes the
+    previous frame after presentation; the predicate checks the actual app/DOM
+    state. A failed wait propagates once, without sleeping or timeout retries.
+    """
+    options = {} if timeout is None else {'timeout': timeout}
+    # Playwright tests the immediate predicate return for truthiness: an async
+    # predicate's Promise succeeds even when it later resolves to false. Keep
+    # the presentation boundary separate and the polled app predicate sync.
+    boundary = page.evaluate_handle('''() => {
+        const boundary = {presented: false};
+        requestAnimationFrame(() => requestAnimationFrame(() => {boundary.presented = true;}));
+        return boundary;
+    }''')
+    try:
+        page.wait_for_function('boundary => boundary.presented && (' + predicate + ')()',
+                               arg=boundary, **options)
+    finally:
+        boundary.dispose()
+
+
+def write_failure_artifacts(page, artifact_dir: pathlib.Path, name: str, page_errors: list[str], console_errors: list[str]) -> None:
+    ensure_artifact_dir(artifact_dir)
+    png_path = artifact_dir / f"{name}.png"
+    html_path = artifact_dir / f"{name}.html"
+    log_path = artifact_dir / f"{name}.log"
+    with contextlib.suppress(Exception):
+        page.screenshot(path=str(png_path), full_page=True)
+    with contextlib.suppress(Exception):
+        html_path.write_text(page.content(), encoding="utf-8")
+    log_lines = ["[page errors]"]
+    log_lines.extend(page_errors or ["(none)"])
+    log_lines.append("")
+    log_lines.append("[console errors]")
+    log_lines.extend(console_errors or ["(none)"])
+    log_path.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
+
+
+def run_appearance_scenarios(root: pathlib.Path, artifact_dir: pathlib.Path, scenarios) -> None:
+    """Run the existing Looks scenarios independently with their original setup."""
+    from playwright.sync_api import sync_playwright
+
+    with run_http_server(root) as url, sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        try:
+            for scenario in scenarios:
+                context = browser.new_context(viewport={"width": 1200, "height": 1000}, device_scale_factor=1)
+                page = context.new_page()
+                errors, console_errors = [], []
+                page.on("pageerror", lambda error: errors.append(str(error)))
+                page.on("console", lambda message: console_errors.append(message.text) if message.type == "error" else None)
+                page.on("dialog", lambda dialog: dialog.dismiss())
+                try:
+                    page.goto(url + "?workspaceLab=0")
+                    page.wait_for_function("() => window.VibeMolAppearanceLooks")
+                    scenario(page, context, url)
+                    assert not errors, errors
+                except Exception:
+                    write_failure_artifacts(page, artifact_dir, "appearance-" + scenario.__name__, errors, console_errors)
+                    raise
+                finally:
+                    context.close()
+        finally:
+            browser.close()

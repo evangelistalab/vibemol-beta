@@ -1,0 +1,833 @@
+{
+  "baseline": {
+    "commit": "3425e0231b71eeb8b8a11523806990f553265cba",
+    "tag": "v0.10.0",
+    "appSha256": "9d9d1a5928d27610232bd506bb84ad47932952b7bcd67aee41d81e16aef15bfa",
+    "viewport": {
+      "width": 1512,
+      "height": 1000
+    },
+    "captureTimestampFields": [
+      "savedAt",
+      "preset.meta.createdAt",
+      "preset.meta.updatedAt"
+    ],
+    "pinnedCamera": [
+      30,
+      0,
+      0
+    ],
+    "metrics": {
+      "lines": 31639,
+      "functionDeclarations": 1163,
+      "letDeclarations": 249,
+      "constDeclarations": 570
+    },
+    "captureProvenance": {
+      "os": "Linux",
+      "osRelease": "6.17.0-1022-azure",
+      "architecture": "x86_64",
+      "browserName": "chromium",
+      "browserVersion": "156.0.8078.4",
+      "ci": {
+        "provider": "GitHub Actions",
+        "runUrl": "https://github.com/evangelistalab/vibemol/actions/runs/39161918761",
+        "runAttempt": "1",
+        "runnerImage": "ubuntu24"
+      }
+    }
+  },
+  "captures": 102,
+  "comparison": {
+    "floatLeaves": {
+      "relTol": 1e-09,
+      "absTol": 1e-12
+    },
+    "exact": [
+      "types",
+      "integers",
+      "booleans",
+      "strings",
+      "keys",
+      "lengths",
+      "structure"
+    ],
+    "reason": "The complete CI/local audit found only 32 one- or four-ULP bond-z differences: maximum absolute 4.235164736271502e-22, relative 7.82384323679457e-16. The tolerance accommodates floating-point platform drift while rejecting a 1e-6 change.",
+    "summary": "Goldens are compared with tolerance for float leaves and are expected to hold across machines; all other leaves, types and structure remain exact."
+  },
+  "determinism": {
+    "runs": 2,
+    "identical": true,
+    "exact": true,
+    "captureSha256PerRun": [
+      "ec8aedbceed3bf63a70844faed905366821e32e9ea7bf3ccf0f2170ee2336d6a",
+      "ec8aedbceed3bf63a70844faed905366821e32e9ea7bf3ccf0f2170ee2336d6a"
+    ]
+  },
+  "api": {
+    "VibeMolAppearanceEditor": [
+      "createController"
+    ],
+    "VibeMolAppearanceLooks": [
+      "apply",
+      "applyColors",
+      "closeStudio",
+      "edit",
+      "list",
+      "material",
+      "openStudio",
+      "snapshot"
+    ],
+    "VibeMolAppearanceModel": [
+      "clone",
+      "cloneMaterial",
+      "createMaterial",
+      "fromLegacy",
+      "legacy",
+      "material",
+      "materialEqual",
+      "materialLimits",
+      "materialParameters",
+      "normalize",
+      "patchMaterial",
+      "resolvedMaterial",
+      "surfacePreset",
+      "surfacePresets",
+      "validateMaterial"
+    ],
+    "VibeMolAppearanceUi": [
+      "createAppearanceInspectorController"
+    ],
+    "VibeMolArithmeticGrid": [
+      "MAX_TARGET_VOXELS",
+      "MAX_WORKING_BYTES",
+      "compute",
+      "createComputation",
+      "formatResampleNotice",
+      "inspectAxisAlignedGrid",
+      "normalizeOperation",
+      "sameGrid",
+      "sampleTrilinear",
+      "validateInputGrids"
+    ],
+    "VibeMolArithmeticLayers": [
+      "createArithmeticLayers"
+    ],
+    "VibeMolArithmeticRunner": [
+      "createArithmeticRunner"
+    ],
+    "VibeMolAssets": [
+      "url",
+      "version"
+    ],
+    "VibeMolAutoHydrogen": [
+      "AUTO_HYDROGEN_Z",
+      "buildAutoHydrogenPlan",
+      "createAutoHydrogenController",
+      "getAutoHydrogenRule",
+      "isAutoHydrogenSupportedAtomicNumber",
+      "resolveGeometryForEnvironment",
+      "summarizeAutoHydrogenPlan"
+    ],
+    "VibeMolAutoIso": [
+      "createAutoIsoController"
+    ],
+    "VibeMolAxisGizmo": [
+      "create",
+      "projectEndpoints"
+    ],
+    "VibeMolBondEditing": [
+      "createBondEditingController"
+    ],
+    "VibeMolBondGeometry": [
+      "componentOffsets",
+      "createCylinder",
+      "fitBond",
+      "seatDepth",
+      "sphereFitRadius"
+    ],
+    "VibeMolBondInference": [
+      "AUTO_BOND_MIN_DISTANCE",
+      "AUTO_BOND_TOLERANCE",
+      "MAX_METAL_COORDINATION",
+      "METAL_BOND_RADIUS",
+      "acceptBondCandidatesByDistanceRank",
+      "buildBondAdjacency",
+      "chooseTargetValence",
+      "classifyBondCleanupDiff",
+      "collectBondCandidates",
+      "collectRawBondCandidates",
+      "countsTowardAtomValence",
+      "enforceAlternatingSixRingBondOrders",
+      "findSimpleCyclesOfSize",
+      "getAllowedMainGroupValences",
+      "getCovalentRadiusAngstrom",
+      "getElementMaxCoordination",
+      "getMetalBondRadiusAngstrom",
+      "getPairMaxBondOrder",
+      "getUndirectedPairKey",
+      "hasBondCandidates",
+      "inferAromaticSixRings",
+      "inferBondOrders",
+      "isAutoBondSupportedAtomicNumber",
+      "isLanthanideOrActinideAtomicNumber",
+      "isMetalAtomicNumber",
+      "isMonovalentMainGroupAtomicNumber",
+      "isTransitionMetalAtomicNumber",
+      "normalizeMetalBondMode",
+      "perceiveBondConnectivity"
+    ],
+    "VibeMolCalculations": [
+      "addPlane",
+      "cacheSize",
+      "configure",
+      "enter",
+      "export",
+      "ready",
+      "selectAtoms",
+      "selectComponent",
+      "selectShell",
+      "state",
+      "toggleAtom"
+    ],
+    "VibeMolCalculationsModel": [
+      "addPlane",
+      "atoms",
+      "choiceFor",
+      "componentsFor",
+      "defaultShell",
+      "defaults",
+      "fitPlane",
+      "generate",
+      "loadBasis",
+      "normalize",
+      "optionsFor",
+      "periodFor",
+      "planeEligible",
+      "planeSpecs",
+      "previewBasis",
+      "projection",
+      "prune",
+      "removeOrbitals",
+      "selectComponent",
+      "selectComponents",
+      "selectShell",
+      "selectShells",
+      "selectedIds",
+      "selectionContext",
+      "setBasis",
+      "setOptions",
+      "setSelectedAtoms",
+      "shellsFor",
+      "specs",
+      "state",
+      "toggleAtom",
+      "validation"
+    ],
+    "VibeMolCalculationsPanel": [
+      "create"
+    ],
+    "VibeMolCalculationsPicker": [
+      "create"
+    ],
+    "VibeMolCloudRendering": [
+      "absPercentile",
+      "buildCloudCubes",
+      "buildCloudCubes2CPhase",
+      "buildCloudCubes2CTotal",
+      "buildCloudPoints",
+      "buildCloudPoints2CPhase",
+      "buildCloudPoints2CTotal",
+      "estimateCellSize",
+      "voxelCenterToWorld"
+    ],
+    "VibeMolCoordination": [
+      "GeometryId",
+      "getCoordinationProfile",
+      "getGeometry",
+      "isCoordinationChoiceCompatible",
+      "listHaloCoordinationChoices",
+      "resolveAutoCoordinationChoice"
+    ],
+    "VibeMolDisplayWindows": [
+      "ESCAPABLE_WINDOW_IDS",
+      "EXCLUSIVE_WINDOW_IDS",
+      "WINDOW_IDS",
+      "createDisplayWindowsController"
+    ],
+    "VibeMolEditCommands": [
+      "createAtomSnapshotCommand"
+    ],
+    "VibeMolEditGestures": [
+      "createEditGestureController"
+    ],
+    "VibeMolEditGizmos": [
+      "createEditGizmosController"
+    ],
+    "VibeMolEditHalo": [
+      "createEditHaloController"
+    ],
+    "VibeMolEditPlacement": [
+      "createEditPlacementController"
+    ],
+    "VibeMolEditState": [
+      "createEditStateController"
+    ],
+    "VibeMolEditToolUi": [
+      "createController",
+      "createSceneTools",
+      "describe",
+      "escapeAction"
+    ],
+    "VibeMolEditTools": [
+      "createEditToolsController"
+    ],
+    "VibeMolEditTransform": [
+      "createEditTransformController"
+    ],
+    "VibeMolEditUi": [
+      "bindAdaptivePopoverItem",
+      "createAdaptiveMenuAutoHideController",
+      "createAdaptivePopoverController",
+      "createSelectionPositionController",
+      "positionAdaptiveMenu",
+      "positionFloatingPopover",
+      "positionRightOperatorPanel",
+      "restorePaneHome",
+      "setCueState",
+      "updateAdaptiveMenuUi",
+      "updateAddAtomOperatorPanelUi",
+      "updateAddMoleculeOperatorPanelUi"
+    ],
+    "VibeMolEditUtils": [
+      "classifyBondHitSectionFromPoints",
+      "computeInertiaTensorFromAtoms",
+      "computeMassPropertiesFromAtoms",
+      "eigenSymmetric3x3"
+    ],
+    "VibeMolElementUtils": [
+      "clamp",
+      "clampOrZero",
+      "clampWithUpperPriority",
+      "getElementSymbol",
+      "getElementSymbolByAtomicNumber",
+      "getElementSymbolRaw",
+      "isLanthanideOrActinideAtomicNumber",
+      "isTransitionMetalAtomicNumber"
+    ],
+    "VibeMolEmbed": [
+      "loadFiles",
+      "version"
+    ],
+    "VibeMolFigure": [
+      "compose",
+      "limits",
+      "listTargets",
+      "open",
+      "viewport"
+    ],
+    "VibeMolFigureComposer": [
+      "MAX_PANELS",
+      "MAX_PIXELS",
+      "create",
+      "defaults",
+      "layout",
+      "pngDensity",
+      "stem",
+      "svg"
+    ],
+    "VibeMolFigurePanel": [
+      "create"
+    ],
+    "VibeMolFigureRenderer": [
+      "create"
+    ],
+    "VibeMolFileLoader": [
+      "createFileLoader"
+    ],
+    "VibeMolFloatingPanels": [
+      "constrain",
+      "get",
+      "list",
+      "register"
+    ],
+    "VibeMolFragments": [
+      "FRAGMENT_LIBRARY",
+      "buildCatalogInstance",
+      "buildFragmentInstance",
+      "getCatalogEntries",
+      "getCatalogEntryById",
+      "getFragmentById",
+      "loadFragmentLibraryFromManifest",
+      "resetFragmentLibraryToBuiltins",
+      "resolveCatalogQuery",
+      "resolveFragmentQuery"
+    ],
+    "VibeMolGeometryInference": [
+      "VSEPR_TABLE",
+      "baseValence",
+      "inferAllAtomGeometries",
+      "inferAtomGeometry",
+      "inferGeometryFromState",
+      "period",
+      "resolveEffectiveValence",
+      "valenceElectrons"
+    ],
+    "VibeMolGridStore": [
+      "createGridStore"
+    ],
+    "VibeMolHydrogenBonds": [
+      "CRITERIA",
+      "inferContacts",
+      "updateGraphics"
+    ],
+    "VibeMolIOUtils": [
+      "detectAndNormalizeXyzText",
+      "detectInputFileKind",
+      "looksLikePsi4OutputText"
+    ],
+    "VibeMolInteraction": [
+      "createShortcutRegistry",
+      "isTypingInInput",
+      "normKey"
+    ],
+    "VibeMolListPopover": [
+      "createListPopoverController",
+      "findNextEditableCellPosition",
+      "formatOrbitalRelativeLabel",
+      "formatOrbitalSpinGlyph",
+      "getOrbitalBoundary",
+      "passesOrbitalEnergyThreshold",
+      "resolveSingleDividerPlacement"
+    ],
+    "VibeMolLooks": [
+      "baseline",
+      "builtins",
+      "cameraFields",
+      "colorKeys",
+      "colors",
+      "colorsEqual",
+      "createReferenceController",
+      "defaults",
+      "equal",
+      "exportLook",
+      "extra",
+      "fields",
+      "importLook",
+      "isLookPreset",
+      "materialFamilies",
+      "materialPresets",
+      "materialRecipe",
+      "normalizeLook",
+      "normalizeReferenceState",
+      "normalizeSurfaceScheme",
+      "sameReference",
+      "settings",
+      "styleEqual",
+      "surfaceColorSchemes",
+      "surfaceGroups",
+      "surfaceOverrides",
+      "withColors"
+    ],
+    "VibeMolLooksUi": [
+      "createController"
+    ],
+    "VibeMolMeasurements": [
+      "MAX_ENTRIES",
+      "add",
+      "canUndo",
+      "clear",
+      "configure",
+      "csv",
+      "key",
+      "layoutLabels",
+      "normalize",
+      "remove",
+      "rows",
+      "state",
+      "undo",
+      "value"
+    ],
+    "VibeMolMeasurementsPanel": [
+      "create"
+    ],
+    "VibeMolMinaoRenderer": [
+      "DEFAULT_CONTOUR",
+      "create",
+      "grid",
+      "harmonic",
+      "normalizeContour",
+      "radial"
+    ],
+    "VibeMolParsers": [
+      "arrayMinMax",
+      "parseCube",
+      "parseMolden",
+      "parsePsi4Geometry",
+      "parseTwoComponentCube",
+      "parseXYZ"
+    ],
+    "VibeMolPeriodicTable": [
+      "createPeriodicTableController"
+    ],
+    "VibeMolPrefs": [
+      "applyFontPair",
+      "getFontPair",
+      "setFontPair"
+    ],
+    "VibeMolPreset": [
+      "download",
+      "export",
+      "import",
+      "kind",
+      "listKeys",
+      "listSchema",
+      "version"
+    ],
+    "VibeMolPresetModule": [
+      "createPresetController"
+    ],
+    "VibeMolPropertiesInspector": [
+      "createController"
+    ],
+    "VibeMolPubChem": [
+      "createPubChemController"
+    ],
+    "VibeMolRecovery": [
+      "flush",
+      "getState",
+      "recover",
+      "startFresh"
+    ],
+    "VibeMolRendering": [
+      "computeVolumeStats",
+      "getAlphaBetaMagnitudeMaxima",
+      "isPhaseLikeComponent",
+      "maxAbs",
+      "maxMagnitude",
+      "maxTotalDensity"
+    ],
+    "VibeMolSceneExport": [
+      "activateTarget",
+      "captureGraphState",
+      "exportTargets",
+      "listTargets",
+      "restoreGraphState"
+    ],
+    "VibeMolSceneGraph": [
+      "DEFAULT_CUBE_APPEARANCE",
+      "LAYER_KIND",
+      "SURFACE_STYLE",
+      "createCubeAppearance",
+      "createSceneGraphController",
+      "isCubeLikeLayer"
+    ],
+    "VibeMolSceneOutliner": [
+      "createSceneOutliner"
+    ],
+    "VibeMolSceneSources": [
+      "createSceneSources"
+    ],
+    "VibeMolSession": [
+      "export",
+      "exportText",
+      "import",
+      "importText",
+      "kind",
+      "validateText",
+      "version"
+    ],
+    "VibeMolSessionFormat": [
+      "KIND",
+      "MAX_BYTES",
+      "VERSION",
+      "decode",
+      "encode",
+      "validate",
+      "validateVolume"
+    ],
+    "VibeMolSessionModule": [
+      "activeContext",
+      "capture",
+      "captureVolume",
+      "createSessionController",
+      "hydrate",
+      "sessionName",
+      "snapshotName"
+    ],
+    "VibeMolSessionRecovery": [
+      "DATABASE",
+      "MAX_BYTES",
+      "createRecoveryController",
+      "createRecoveryStore"
+    ],
+    "VibeMolStructure": [
+      "exportActive",
+      "exportActiveText",
+      "importFromText",
+      "kind",
+      "parseText",
+      "version"
+    ],
+    "VibeMolStructureCore": [
+      "absorbObservedBuilderId",
+      "allocateBuilderAtomId",
+      "allocateBuilderGroupId",
+      "allocateBuilderOpId",
+      "appendVolumeSelectionClipboard",
+      "bondSnapshotsEqual",
+      "buildVolumeBondId",
+      "buildVolumeSelectionClipboard",
+      "cloneBondSnapshot",
+      "cloneJsonLike",
+      "cloneJsonStructuredData",
+      "cloneStructuredData",
+      "cloneVolumeAnnotationsSnapshot",
+      "createVolumeBondNormalizationContext",
+      "ensureAtomId",
+      "ensureVolumeAtomIds",
+      "ensureVolumeSchema",
+      "findVolumeBondRecordIndex",
+      "getAtomBuilderMeta",
+      "getAtomCoordinationMeta",
+      "getAtomMetalBondingMeta",
+      "getBuilderAnnotationsMap",
+      "getCoordinationAnnotationsMap",
+      "getHydrogenBondError",
+      "getMetalBondingAnnotationsMap",
+      "isPlainObject",
+      "migrateLegacyBuilderAnnotations",
+      "normalizeEditAddBondOrder",
+      "normalizeMetalBondingMode",
+      "normalizeVolumeAtom",
+      "normalizeVolumeBondKind",
+      "normalizeVolumeBondOrigin",
+      "normalizeVolumeBondRecord",
+      "normalizeVolumeBondStyle",
+      "normalizeVolumeBonds",
+      "pruneVolumeAtomAnnotations",
+      "rehydrateClonedVolume",
+      "removeVolumeBond",
+      "resolveVolumeAtomId",
+      "setAtomBuilderMeta",
+      "setAtomCoordinationMeta",
+      "setAtomMetalBondingMeta",
+      "upsertVolumeBond"
+    ],
+    "VibeMolStructureTransport": [
+      "createStructureTransportController"
+    ],
+    "VibeMolStyleStudio": [
+      "createController"
+    ],
+    "VibeMolSymmetry": [
+      "analyzePointGroup",
+      "applySymmetryPreview",
+      "buildSymmetryPreview",
+      "createEditSymmetryController",
+      "describeSymmetryElements"
+    ],
+    "VibeMolSymmetryPanel": [
+      "DEFAULT_SYMMETRY_TOLERANCE_ANG",
+      "EXACT_SYMMETRY_TOLERANCE_ANG",
+      "MAX_SYMMETRY_TOLERANCE_ANG",
+      "SYMMETRY_TOLERANCE_OPTIONS_ANG",
+      "createSymmetryPanelController"
+    ],
+    "VibeMolTesting": [
+      "attachFragmentFromAnchorIndex",
+      "copyEditSelectionToClipboard",
+      "getActiveTransformGesture",
+      "getBondCarrierSnapshots",
+      "getBondCenterCueState",
+      "getBondSideCueState",
+      "getCameraSnapshot",
+      "getCloudMaterialSnapshot",
+      "getEditBuildState",
+      "getEditSelectionCount",
+      "getEditSelectionIndices",
+      "getHaloGhostPreviewKind",
+      "getHaloGhostWorlds",
+      "getHaloReplaceTargetWorlds",
+      "getHintMessage",
+      "getLookLightingSnapshot",
+      "getLookMaterialSnapshot",
+      "getMeasurementSnapshot",
+      "getMoleculeRenderSnapshot",
+      "getOpenNonEditWindows",
+      "getSceneGraphSnapshot",
+      "getSelectionCoordinationChoices",
+      "getSimulationBoxSnapshot",
+      "getSurfaceMaterialSnapshot",
+      "getTransformAngleGuideClient",
+      "getTransformDistanceGuideClient",
+      "getWboitSnapshot",
+      "isFuseRingPreviewActive",
+      "listNonEditWindows",
+      "pasteEditClipboardSelection",
+      "performSelectionMoveDrag",
+      "pickEditHitAtClient",
+      "pickTransformValueLabelAtClient",
+      "probeSelectionMoveDragStart",
+      "projectActiveAtomToClient",
+      "projectHaloGhostToClient",
+      "projectHaloReplaceTargetToClient",
+      "rebuildScene",
+      "replaceGestureTerminalHydrogen",
+      "setEditSelectionIndices",
+      "triggerHaloGhostByIndex",
+      "triggerHaloReplaceTargetByAtomIndex"
+    ],
+    "VibeMolTooltip": [
+      "hideTooltip",
+      "installGlobalTooltipDelegation"
+    ],
+    "VibeMolTrajectoryClock": [
+      "advance",
+      "mapFrame",
+      "normalize"
+    ],
+    "VibeMolTrajectoryPlayback": [
+      "createTrajectoryPlaybackController"
+    ],
+    "VibeMolTrajectoryUi": [
+      "createTrajectoryUi"
+    ],
+    "VibeMolTrajectoryVideo": [
+      "DEFAULTS",
+      "EXPORT_MODES",
+      "clampCanvasVideoNumber",
+      "clampTrajectoryVideoNumber",
+      "createCanvasVideoExportController",
+      "createCanvasVideoRecorder",
+      "createDefaultCanvasVideoCropRect",
+      "createDefaultTrajectoryVideoCropRect",
+      "createTrajectoryVideoExportController",
+      "createTrajectoryVideoRecorder",
+      "getCanvasVideoMimeCandidates",
+      "getTrajectoryVideoMimeCandidates",
+      "normalizeCanvasVideoCropRect",
+      "normalizeTrajectoryVideoCropRect",
+      "resolveCanvasVideoOverlayLayout",
+      "resolveTrajectoryVideoOverlayLayout",
+      "roundCanvasVideoEven",
+      "roundTrajectoryVideoEven",
+      "supportsCanvasVideoExport",
+      "supportsTrajectoryVideoExport"
+    ],
+    "VibeMolUFF": [
+      "UFF_PARAMS",
+      "assignAtomType",
+      "createLocalOptimizationContext",
+      "createUFFSystem",
+      "energyComponents",
+      "getParams",
+      "guessBondOrder",
+      "localEnergy",
+      "localGradient",
+      "minimize",
+      "minimizeSteepestDescent",
+      "minimizeStep",
+      "totalEnergy",
+      "totalGradient"
+    ],
+    "VibeMolUFFAdapter": [
+      "createLocalUffContextFromVolume",
+      "optimizeVolumeWithUFF",
+      "relaxHydrogenOnlyLocalContext"
+    ],
+    "VibeMolUFFLocal": [
+      "createActiveLocalUffContext",
+      "optimizeActiveStructureWithUff"
+    ],
+    "VibeMolUI": [
+      "plural",
+      "renderCoordsContent",
+      "volumeToXYZ"
+    ],
+    "VibeMolVibration": [
+      "CM_INV_HTML",
+      "CM_INV_TEXT",
+      "VIBRATION_DEFAULT_AMPLITUDE",
+      "VIBRATION_DEFAULT_SPEED",
+      "VIBRATION_HIDE_SMALL_FREQ_THRESHOLD_CM1",
+      "VIBRATION_IR_DEFAULT_SIGMA_CM1",
+      "VIBRATION_IR_MIN_FREQ_CM1",
+      "VIBRATION_KIND",
+      "createVibrationController"
+    ],
+    "VibeMolViewUtils": [
+      "computeOrthographicFrustum",
+      "computePerspectiveFitDistance",
+      "copyCameraPose",
+      "createCameraDepthController",
+      "createGroupedInstanceRaycast",
+      "createPickCache",
+      "getViewportSize",
+      "setCameraRay"
+    ],
+    "VibeMolVolume2C": [
+      "hsvToRgb",
+      "make2CPhaseIsosurface",
+      "make2CTotalColoredIsosurface"
+    ],
+    "VibeMolVolumeGeometry": [
+      "applyGradientNormals",
+      "atomUnitsToAng",
+      "buildGridTransform",
+      "computeGradientNormalsForVoxelPositions",
+      "createScalarFieldSampler",
+      "makeIsosurface",
+      "mergeGeometryVertices",
+      "sampleTrilinearGrid",
+      "voxelToWorld",
+      "worldToAtomUnits",
+      "worldToVoxel"
+    ],
+    "VibeMolWorkbench": [
+      "afterModeChange",
+      "applyLayout",
+      "beforeModeChange",
+      "close",
+      "focusQuickActions",
+      "isDocked",
+      "manages",
+      "open",
+      "park",
+      "place",
+      "preset",
+      "refresh",
+      "restoreIfHidden",
+      "setFocus",
+      "snapshot"
+    ],
+    "VibeMolWorkbenchHost": [
+      "awaitingRecovery",
+      "calculations",
+      "clearMeasurements",
+      "editTool",
+      "editToolEscape",
+      "enabled",
+      "getMode",
+      "properties",
+      "resize",
+      "setSidebarCollapsed",
+      "windows"
+    ],
+    "VibeMolWorkbenchModel": [
+      "catalog",
+      "normalize",
+      "regions",
+      "resolveId"
+    ]
+  },
+  "goldenSha256": "28ad6ba41b4d146095879de97fcf1b7f4495f79c547c6a6b8287c6813ee99d27",
+  "pixelDiagnostic": {
+    "hashesPerRun": 64,
+    "changedSnapshots": []
+  },
+  "consoleExceptions": {
+    "vendorWarning": "Scripts \"build/three.js\" and \"build/three.min.js\" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation",
+    "browserReadbackDiagnostic": "^\\[\\.WebGL-0x[0-9a-f]+\\]GL Driver Message \\(OpenGL, Performance, GL_CLOSE_PATH_NV, High\\): GPU stall due to ReadPixels(?: \\(this message will no longer repeat\\))?$"
+  }
+}

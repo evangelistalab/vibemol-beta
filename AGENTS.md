@@ -1,0 +1,771 @@
+# AGENTS.md
+
+## Refactor and 0.10.0 release status
+
+Stage 5 is complete and 0.10.0 is published at `3425e0231b71eeb8b8a11523806990f553265cba`. No user-facing changes or production defect fixes were included. The three groups were: 5a PR #26 trajectory shadows 262 → 260 lets, 8 used dependencies, construction 29 app / 129 module bindings; 5b #27 vibration 260 → 256, 13 dependencies, 16/161; 5c #28 symmetry 256 → 249, 11 dependencies, 27/125. Final app count is 249 (16 below Stage 3's accepted 265). Periodic-table has 11 used inputs; PubChem 13. Continuous vibration phase advancement and its 0.2s cap remain unchanged. The duplicated-clock hypothesis for #11 is refuted.
+
+The ordinary gate remains **34 passing / 3 failing / 37**, exactly axis Escape/canvas focus, Coordinates Delete/selection-card interception and Smoke #11 at trajectory OR vibration idle wait after the second download. Match `(suite, workflow)`, never line number. Missing, additional or changed workflows, including 35/2, stop. Require 102 exact goldens twice, the fixed 52-slot composition across eight contexts/all minima, checks/units/WebKit and the inverse construction-order audit. Workbench is 47 live + 5 known-absent; legacy 48 + 4. The latest pre-publication main conjunction is [run 39158578780](https://github.com/evangelistalab/vibemol/actions/runs/39158578780); the baseline promotion still receives its own first ordinary gate.
+
+[Diagnostic 39154813750](https://github.com/evangelistalab/vibemol/actions/runs/39154813750) observed the hint auto-hide fade: tagged 3/3 original-suite passes, accepted PR tree 2/3, main 1/3. Actual compositor frames refuted a pre-canvas-paint cause in the failures; the hint theme-background transition had finished. Separate harness PR #32 waits for `document.fonts.ready`, completed CSS transitions and two frames before every axe scan. Preserve the original incomplete baseline. The named set in `accessibility_contract.py` covers only light/dark Calculations `#hint` with exact `color-contrast`/`imgNode` and related `#canvas`; incomplete remains incomplete. New unresolved targets, changed reasons/canvases and violations still fail. Assertions log comparands on both outcomes. Diagnostics never supply acceptance; the retrospective records why case classification deferred the specified class fix twice.
+
+The temporary 0.9.5 → 0.10.0 projection is **expired and removed**, including both immutable tree scopes, helper/call and 19 temporary tests. Published-tag CI [run 39161918761](https://github.com/evangelistalab/vibemol/actions/runs/39161918761) recorded 102 captures twice on each of two independent workers; all four serializations match exactly. Exactly 204 approved full-path version leaves and zero residual difference were verified. The new 0.10.0 goldens include all six extracted namespaces, so the additive API list is empty. Future version values compare exactly; no version tolerance remains. Permanent negative controls cover both `session.appVersion` and `session.preset.appVersion`.
+
+The native release matrix completed all four modes, both themes and 1512/1280/1024 with 204 session Save/Open pairs and 816 mode observations. The deployed beta also resolves all six namespaces and its runtime source hashes. No standalone HTML exporter exists; it remains an unbuilt 0.11+ candidate and was not a release gate. Product priority is **#25 → #17**; #3/#4/#11 and maintenance #5/#14/#15 remain carried. #21 is closed as test synchronization. The material-preset intermittent remains open; every ordinary run reports Looks duration and both material-family paths, while diagnostics/recordings state when coverage was not exercised.
+
+## Purpose
+This repository contains `VibeMol`, a static browser app for molecular visualization, plus a Python automation client.
+
+Supported molecular file types:
+- `.cube` / `.cub`
+- `.2ccube` (two-component)
+- `.xyz`
+- `.molden`
+- `.vib.json` / `.vmodes.json` / `.modes.json` (vibrational mode sidecar data)
+- `.hess` (ORCA Hessian vibrational mode source)
+- `.dat` / `.out` / `.output` (Psi4 text output with harmonic analysis)
+- `.vibemol-session` (complete saved workspace)
+
+Primary capabilities:
+- Iso-surface rendering and cloud rendering
+- Atom/bond rendering with multiple molecule styles
+- Edit mode, transform mode, and measurement mode
+- Calculations mode: structure-first MINAO selection and forte2 AVAS input generation (no execution)
+- Fragment attachment and standalone molecule placement in the editor
+- Multi-frame XYZ trajectory playback (play/pause, frame slider, FPS, loop)
+- Vibrational mode playback (mode table, amplitude, speed, hide-small-frequencies filter)
+- PNG export, XYZ export, and cropped WebM export for trajectories and vibrational modes
+- Portable preset save/load (web and CLI compatible)
+- Complete portable session save/open, browser autosave, and explicit recovery
+- Molden molecular-orbital parsing, grid generation, and rendering
+
+## Project Layout
+- `Makefile`: local check/test entrypoints (`check`, `test-unit`, `test-e2e`, `test`).
+- `index.html`: UI shell, controls, and required script loading order.
+- `src/styles/tokens.css`: shared design tokens and theme variables.
+- `src/styles/vm-tooltip.css`: shared tooltip presentation.
+- `src/styles/vm-list-popover.css`: shared floating list-popover shell styling used by Coordinates, Orbitals, and Trajectory chrome.
+- `assets/app/css/palette.css`: shared palette/theme utility rules.
+- `assets/app/css/edit-ui.css`: edit-mode adaptive menu, cue-row, popover, and operator-panel styling.
+- `assets/app/css/display-ui.css`: non-edit adaptive launcher, floating auxiliary inspector, and Appearance inspector styling.
+- `src/prefs.js`: persistent UI preference helpers (theme/font pair globals).
+- `src/components/VmListPopover.js`: shared schema-driven list-popover controller used by Coordinates and Orbitals.
+- `src/components/VmTooltip.js`: shared root tooltip portal and delegation helpers.
+- `assets/app/js/app.js`: main app orchestration, scene lifecycle, style logic, preset API, file loading.
+- `assets/app/js/scene-graph.js`: authoritative scene/layer model and explicit rename, move, order, focus, and visibility commands.
+- `assets/app/js/scene-sources.js`: incremental source registration and metadata-only registration of every Molden orbital; redraws never reconstruct the graph.
+- `assets/app/js/scene-export.js`: explicit batch targets and restoration of graph state after success or failure.
+- `assets/app/js/figure-composer.js`, `figure-renderer.js`, `figure-panel.js`, and `assets/app/css/figure.css`: dockable publication-figure grids with one locked camera, union fitting, shared iso/Look, print PNG/SVG, and finally-based renderer/state restoration. Loaded after scene-export. Output settings are transient, not preset/session state. See `docs/figure-composer.md` and `tests/e2e/figure.py`; oversized panels report a device/8192px cap (tiling deferred).
+- `assets/app/js/scene-outliner.js` and `assets/app/css/scene-outliner.css`: outliner rows, rename sessions, drag feedback, menus, and arithmetic forms.
+- `assets/app/js/grid-store.js`: bounded immutable-grid cache keyed by source, orbital, geometry, and grid settings.
+- `assets/app/js/arithmetic-grid.js`: allocation-free grid validation/planning and chunked scalar arithmetic.
+- `assets/app/js/arithmetic-runner.js` and `assets/app/js/arithmetic-worker.js`: cancellable worker evaluation with a cooperative browser fallback.
+- `assets/app/js/arithmetic-layers.js`: arithmetic dependency traversal and staged updates of affected layers.
+- `assets/app/js/trajectory-clock.js`: pure trajectory timing, frame mapping, and endpoint policy.
+- `assets/app/js/vibration.js`: private authoritative playback/filter/layout state and spectrum/table renderer with13 explicit dependencies. Continuous phase advancement retains the0.2s delta cap. Host parsing, attachment, wiring, shared video export and session transactions stay in app.js; its inert controller precedes startup callbacks.
+- `assets/app/js/trajectory-playback.js`: eight-input playback/scene-clock controller; authoritative clocks stay on records/the scene master, with no copied playing/timestamp shadows. Panel/renderer/shared-export orchestration remains in app.
+- `assets/app/js/trajectory-ui.js` and `assets/app/css/trajectory-ui.css`: trajectory scene rows and synchronized playback controls.
+- `docs/scene-architecture.md`: scene ownership, loading contracts, arithmetic limits, and module boundaries.
+- `assets/app/js/trajectory-video.js`: shared cropped-canvas WebM export controller for trajectory and vibration panels.
+- `assets/app/js/fragments.js`: fragment/molecule catalog loading, manifest support, and fragment builders.
+- `assets/app/js/parsers.js`: parsers (`parseCube`, `parseTwoComponentCube`, `parseXYZ`) including streaming tokenization.
+- `assets/app/js/rendering.js`: volume/stat helpers used by `app.js`.
+- `assets/app/js/periodic-table.js`: lazy Element Colors preview renderer, selected element and popup event wiring, created with explicit app-owned metadata/color/DOM dependencies. It owns no appearance persistence or Build element chooser state.
+- `assets/app/js/pubchem.js`: PubChem autocomplete, 3D lookup/import, SDF-to-XYZ conversion and metadata rendering. Its controller has 13 explicit app dependencies, captures the existing `els` table immediately after its creation, and binds controls at the original late wiring point. App-owned record writes remain explicit callbacks.
+- `assets/app/js/measurements.js` and `assets/app/js/measurements-panel.js`: persistent per-structure measurement values, units/precision, CSV, undo, and the shared Measurements panel. Loaded after view-utils; see `docs/measurements.md` and `tests/e2e/measurements.py`.
+- `assets/app/js/interaction.js`: keyboard shortcut routing and input-focus guards.
+- `assets/app/js/ui.js`: UI formatting helpers for coordinates and XYZ export text.
+- `assets/app/js/axis-gizmo.js` and `assets/app/css/axis-gizmo.css`: six-direction camera orientation gizmo, shared projected hit targets and canvas-export rendering; loads after view-utils.js.
+- `assets/app/js/view-utils.js`: viewport/camera helpers, cached visible-geometry depth fitting, and clipping-aware picking shared by `app.js`.
+- `assets/app/js/edit-utils.js`: edit-mode math helpers (mass properties, inertia, eigen solve).
+- `assets/app/js/calculations-model.js`, `minao-renderer.js`, `calculations-panel.js`, `calculations-picker.js`, and `assets/app/css/calculations.css`: Workbench Calculations mode, transient atom focus, shared-shell popup, exclusive whole-shell/component assignments, plane fitting, contracted AO previews, and forte2 input. Scripts load after edit-utils; rendering is created after the volume helpers. `assets/data/basis/cc-pvtz-minao.json` and `cc-pvtz.json` contain attributed forte2 reference-basis data. See `docs/calculations.md` and `tests/e2e/calculations.py`.
+- `assets/app/js/edit-commands.js`: history command object creation for atom snapshots.
+- `assets/app/js/edit-state.js`: editable-record bootstrap plus undo/redo history orchestration.
+- `assets/app/js/io-utils.js`: input-kind detection helpers shared by drag/drop and import flows.
+- `assets/app/js/structure.js`: minimal incremental structure schema helpers (atoms, styled bonds, builder/coordination/metal-bonding annotations, structure export/import support).
+- `assets/app/js/volume-geometry.js`: pure atom/voxel/world coordinate and marching-cubes isosurface helpers.
+- `assets/app/js/volume-2c.js`: 2C phase and Bloch-colored isosurface builders.
+- `assets/app/js/hydrogen-bonds.js`: explicit-H contact detection using spatial bins and a separate instanced dashed annotation mesh; see `docs/hydrogen-bonds.md`.
+- `assets/app/js/bond-inference.js`: nonmetal covalent candidate generation, metal-aware coordination-style inference, bond-order inference, and aromatic six-ring detection helpers.
+- `docs/bond-fitting.md`: cap seating equations, per-bond radius limits, sphere mesh clearance, and hydrogen topology constraints.
+- `assets/app/js/bond-geometry.js`: continuous closed bond cylinders, sharp element-color boundaries without internal caps, and shared sphere seating / per-bond radius-limit math.
+- `assets/app/js/coordination.js`: coordination-geometry catalog and element-aware coordination choice menus.
+- `assets/app/js/geometry-inference.js`: bond-order-driven main-group geometry inference plus transition-metal coordination defaults.
+- `assets/app/js/uff.js`: standalone UFF force-field implementation plus local energy/gradient helpers.
+- `assets/app/js/uff-adapter.js`: thin adapter from VibeMol editable volumes into full/local UFF system contexts.
+- `assets/app/js/auto-hydrogen.js`: auto-hydrogen planning heuristics and edit-mode hydrogenation controller.
+- `assets/app/js/autoiso.js`: auto-iso estimation, cache, and worker orchestration controller.
+- `assets/app/js/cloud-rendering.js`: standard and two-component cloud geometry builders.
+- `assets/app/js/preset.js`: preset registry, import/export controller, and builder-extension preset state helpers.
+- `assets/app/js/structure-transport.js`: reproducible structure envelope export/import controller and `window.VibeMolStructure` API.
+- `assets/app/js/session-format.js`: versioned portable session schema, bounded buffer codec, checksums, and dependency/shape validation.
+- `assets/app/js/session.js`: durable workspace capture, staged graph/source hydration, and `window.VibeMolSession` controller.
+- `assets/app/js/session-recovery.js`: debounced IndexedDB autosave, atomic two-snapshot retention, explicit recovery, and cross-tab revision checks.
+- `assets/app/css/session-ui.css` and `docs/sessions.md`: session/recovery controls and persistence/API documentation.
+- `assets/app/js/file-loader.js`: file ingestion, onboarding sample loads, drag/drop, embed file-loading controller, and XYZ text detection/normalization helpers.
+- `assets/app/js/bond-editing.js`: bond tool popup/create/delete controller.
+- `assets/app/js/edit-ui.js`: adaptive edit menu, floating popover, and operator-panel UI helpers.
+- `assets/app/js/display-windows.js`: non-edit adaptive launcher/window catalog, exclusivity rules, positioning, and floating-inspector anchoring controller.
+- `assets/app/js/floating-panels.js` and `assets/app/css/floating-panels.css`: shared pointer/touch/keyboard dragging for every custom floating interface, viewport bounds, transient manual placement, and dynamic header registration. See `docs/floating-interfaces.md` for the complete inventory.
+- `assets/app/js/workbench-model.js`, `assets/app/js/workbench.js`, and `assets/app/css/workbench.css`: default v0.9.0 interface with tabbed docks, snap previews, minimized windows, Focus, named layouts, and responsive bottom panels. The scripts load after `app.js` and share `VibeMolWorkbenchHost.enabled`; `?workspaceLab=0` opts into the older interface. See `docs/experiments/workbench/README.md` for rationale, sources, and scope.
+- `assets/app/js/appearance-ui.js`: Appearance inspector chip/action-toggle binding plus conditional-section sync controller.
+- `assets/app/js/appearance-model.js`: independent geometry, material, coloring, lighting, and effect descriptors; validation, legacy migration, and shared material factory.
+- `assets/app/js/appearance-looks.js`: complete resolved look recipes, approved Basic/Toon/Kit presets, experimental candidates, and portable look validation.
+- `assets/app/js/appearance-editor.js`: component controls built from existing inspector rows, switches, sliders, and disclosures.
+- `assets/app/js/looks-ui.js` and `assets/app/css/looks-ui.css`: native preset strip, named look/material libraries, appearance undo, defaults, and minimal layout rules.
+- `assets/app/js/properties-inspector.js`: Workbench Properties window, Object/Look tabs, mixed-selection Structure/Surfaces sections, and per-row surface inheritance resets.
+- `assets/app/js/style-studio.js`: draggable, nonmodal Style Studio window hosting preset previews, Geometry, Colors, Material, Lighting & contours, Surfaces, Undo/Revert, and look/material saving; opened from Appearance. Reuses existing inspector and motion-panel/list-popover styles. Its open state and position are transient; previews apply live to the main renderer. `tests/e2e/style_studio.py` covers popup interactions and responsive themes; `tools/render_look_previews.py` refreshes previews using the actual renderer.
+- `docs/appearance-looks.md`: look scope, preservation, and validation contracts.
+- `assets/app/js/edit-placement.js`: add-atom / fragment / molecule / fuse-ring placement workflows.
+- `assets/app/js/edit-tools.js`: edit-tool state, selection coordination, and transient edit cleanup.
+- `assets/app/js/edit-tool-ui.js`: Build/Transform tool radio strip (first Edit entry uses Build for empty scenes and Transform for loaded structures, then remembers each scene’s tool), neutral pointer crosshair, entity badge, viewport tint, and state-derived hint text. See `docs/edit-tools.md`; armed tool state stays independent of Build panel visibility.
+- `assets/app/js/edit-gizmos.js`: move/rotate gizmo creation, hover state, visibility, and picking helpers.
+- `assets/app/js/edit-transform.js`: shared move/rotate transform-session state, operator-panel application, and pointer-routing controller.
+- `assets/app/js/edit-gestures.js`: gesture-first edit interaction controller and pointer-routing helpers for gesture mode.
+- `assets/app/js/edit-halo.js`: chemistry-aware context halo controller for gesture mode (hover/selection activation, coordination labels, build-target gating, and ghost directions).
+- `assets/app/js/symmetry.js`: point-group analysis, symmetrization preview/apply, and symmetry-element description helpers for edit mode.
+- `assets/app/js/symmetry-panel.js`: Symmetry presentation/cache/selection/timer state with11 explicit dependencies. Its inert holder precedes callback exposure; its existing analysis child initializes at the original point. THREE guides and apply/auto geometry/Undo remain app-owned.
+- `assets/fragments/library.json`: external fragment/molecule catalog manifest.
+- `assets/fragments/*.xyz`: fragment geometry sources using linker-at-origin / +Z bond-vector convention.
+- `assets/fragments/WORKFLOW.md`: fragment authoring workflow and conventions.
+- `tools/reorient_fragment_xyz.py`: reorient one fragment XYZ so atom 1 is the linker at `(0,0,0)` and atom 2 lies on `+Z`.
+- `tools/sync_fragment_library.py`: sync fragment XYZ assets into `assets/fragments/library.json`.
+- `assets/vendor/js/*.js`: vendored runtime dependencies loaded as globals.
+- `assets/data/sample.cube`: bundled sample file used by onboarding quick action.
+- `docs/experiments/`: visual/style experiments and notes.
+- `api/vibemol_client.py`: Playwright-based Python client for automated renders.
+- `api/README.md`: CLI usage, presets, and `.vibemolrc` behavior.
+- `api/requirements.txt`: Python dependencies.
+- `tests/unit/*.test.mjs`: browserless Node unit tests for structure, parser, edit-state, and edit-tool logic.
+- `tests/unit/trajectory-video.test.mjs`: browserless unit coverage for the shared crop/layout video-export helpers.
+- `tests/unit/load-global-module.mjs`: VM-based loader for global/IIFE modules under Node.
+- `tests/e2e/smoke.py`: Playwright smoke/E2E test that starts a temporary local static server.
+- `tests/e2e/premerge.py`: focused browser regressions for molecule styles and preset fallback, append/replace imports, native clipboard round-trips and shortcut conflicts, layer persistence, batch export, Molden orbital browsing/arithmetic dependencies, and synchronized trajectories.
+- `tests/e2e/sessions.py`: fresh-page session round-trips, retained sources, typed arrays, derived dependencies, downloads, quota/corruption recovery, and cross-tab protection.
+- `tests/e2e/mode_consistency.py`: shared coordinate permissions and orbital-context behavior through the original interface, independent of Workbench.
+- `tests/e2e/helpers.py`: shared server/artifact helpers for browser smoke tests.
+- `tests/e2e/accessibility.py`: pinned, test-only axe-core `color-contrast` audit in both themes and all four Workbench modes. Compares failing/incomplete targets against `tests/baselines/color-contrast.json`; `--update-baseline` explicitly records reviewed changes. Incomplete checks are not passes. See `docs/accessibility-qa.md`; do not substitute custom CSS color parsing.
+- `.github/workflows/ci.yml`: CI workflow for checks, unit tests, and browser smoke tests.
+- `notebooks/vibemol_notebook_demo.ipynb`: notebook demo (PNG render + iframe auto-load via postMessage).
+
+## Runtime Model
+No build step is required for the web app. It runs directly from static files.
+
+**Hard constraint1 — runtime loading:** Keep classic scripts, fixed dependency order and `window.VibeMol*` globals. `index.html` loads the scripts directly without a bundler (86 local script files after5c, plus one external analytics script and four inline blocks); converting to ES modules would break that contract. A self-contained HTML exporter remains unbuilt: its September specification is a0.11+ candidate, not a0.10.0 release item.
+
+`assets/app/js/asset-urls.js` loads first in the head and owns the single `APP_VERSION` constant. The app reads `VibeMolAssets.version`; runtime bundled loads use `VibeMolAssets.url`. Run `python3 tools/sync_asset_versions.py --version <version>` to bump a release and stamp committed HTML/CSS URLs together, or `make version-assets` after editing the constant. `make check` rejects stale URLs. Keep workers and their imports versioned too. See `docs/asset-versioning.md` and the real HTTP-cache regression `tests/e2e/asset_cache.py`.
+
+`assets/app/js/element-utils.js` loads immediately after `asset-urls.js`, before every consumer. It exports pure `VibeMolElementUtils` helpers; callers pass atomic metadata explicitly. Symbol/clamp compatibility variants preserve each tagged-base caller's behavior. The standalone Style Lab loads it before volume geometry too.
+
+Required stylesheet order in `index.html`:
+1. `src/styles/tokens.css`
+2. `src/styles/vm-tooltip.css`
+3. `assets/app/css/palette.css`
+4. `assets/app/css/edit-ui.css`
+5. `assets/app/css/display-ui.css`
+   - `assets/app/css/axis-gizmo.css` follows display-ui.css.
+6. `src/styles/vm-list-popover.css`
+7. `assets/app/css/session-ui.css`
+8. `assets/app/css/scene-outliner.css` (after the inline shell styles)
+9. `assets/app/css/trajectory-ui.css`
+10. `assets/app/css/floating-panels.css`
+
+Required script order in `index.html`:
+1. `assets/vendor/js/three.min.js`
+2. `assets/vendor/js/orbit-controls.global.js`
+3. `assets/vendor/js/isosurface.bundle.js`
+4. `assets/vendor/js/atomic-data.js`
+5. `assets/app/js/parsers.js`
+6. `assets/app/js/rendering.js`
+7. `assets/app/js/interaction.js`
+8. `assets/app/js/ui.js`
+9. `assets/app/js/view-utils.js`
+   - `assets/app/js/axis-gizmo.js` follows view-utils.js.
+10. `assets/app/js/edit-utils.js`
+11. `assets/app/js/edit-commands.js`
+12. `assets/app/js/edit-state.js`
+13. `assets/app/js/io-utils.js`
+14. `assets/app/js/fragments.js`
+15. `assets/app/js/structure.js`
+16. `assets/app/js/volume-geometry.js`
+17. `assets/app/js/volume-2c.js`
+    - `bond-geometry.js` loads after `volume-2c.js` and before `bond-inference.js`.
+18. `assets/app/js/bond-inference.js`
+    - `hydrogen-bonds.js` loads immediately after bond inference.
+19. `assets/app/js/auto-hydrogen.js`
+20. `assets/app/js/autoiso.js`
+21. `assets/app/js/cloud-rendering.js`
+22. `assets/app/js/bond-editing.js`
+23. `assets/app/js/edit-ui.js`
+    - `edit-tool-ui.js` loads immediately after edit UI, before `app.js`.
+    - `floating-panels.js` loads immediately before edit UI, registering the static floating shells before their controllers.
+24. `assets/app/js/display-windows.js`
+25. `assets/app/js/appearance-ui.js`
+    - `appearance-model.js`, `appearance-looks.js`, `appearance-editor.js`, `looks-ui.js`, and `style-studio.js` load in that order after Appearance UI and before `app.js`.
+26. `assets/app/js/edit-placement.js`
+27. `assets/app/js/edit-tools.js`
+28. `assets/app/js/edit-gizmos.js`
+29. `assets/app/js/edit-transform.js`
+30. `assets/app/js/edit-gestures.js`
+31. `assets/app/js/coordination.js`
+32. `assets/app/js/geometry-inference.js`
+33. `assets/app/js/uff.js`
+34. `assets/app/js/uff-adapter.js`
+35. `assets/app/js/edit-halo.js`
+36. `assets/app/js/preset.js`
+37. `assets/app/js/structure-transport.js`
+38. `assets/app/js/scene-graph.js`
+39. `assets/app/js/scene-sources.js`
+40. `assets/app/js/scene-export.js`
+41. `assets/app/js/scene-outliner.js`
+42. `assets/app/js/arithmetic-grid.js`
+43. `assets/app/js/arithmetic-runner.js`
+44. `assets/app/js/arithmetic-layers.js`
+45. `assets/app/js/grid-store.js`
+46. `assets/app/js/session-format.js`
+47. `assets/app/js/session.js`
+48. `assets/app/js/session-recovery.js`
+49. `assets/app/js/file-loader.js`
+50. `assets/app/js/symmetry.js`
+51. `src/prefs.js`
+52. `src/components/VmListPopover.js`
+53. `src/components/VmTooltip.js`
+54. `assets/app/js/trajectory-clock.js`
+    - `trajectory-playback.js` follows the clock and precedes app.js; its inert controller is constructed before startup callback registrations, with live owner getters.
+55. `assets/app/js/trajectory-ui.js`
+56. `assets/app/js/trajectory-video.js`
+57. `assets/app/js/app.js`
+    - `periodic-table.js` loads immediately before `app.js`; its controller is constructed at the original periodic-state initialization point and binds controls at the original late UI-wiring point.
+    - `pubchem.js` loads immediately before `periodic-table.js`; its inert controller is constructed immediately after `els`, before any startup restoration callback can read it. Listener wiring remains at its original late point.
+
+`assets/app/js/app.js` requires global modules:
+- `window.VibeMolElementUtils`
+- `window.VibeMolParsers`
+- `window.VibeMolPeriodicTable`
+- `window.VibeMolPubChem`
+- `window.VibeMolRendering`
+- `window.VibeMolInteraction`
+- `window.VibeMolUI`
+- `window.VibeMolListPopover`
+- `window.VibeMolViewUtils`
+- `window.VibeMolAxisGizmo`
+- `window.VibeMolEditUtils`
+- `window.VibeMolEditCommands`
+- `window.VibeMolEditState`
+- `window.VibeMolIOUtils`
+- `window.VibeMolFragments`
+- `window.VibeMolStructureCore`
+- `window.VibeMolVolumeGeometry`
+- `window.VibeMolVolume2C`
+- `window.VibeMolBondInference`
+- `window.VibeMolHydrogenBonds`
+- `window.VibeMolBondGeometry`
+- `window.VibeMolCoordination`
+- `window.VibeMolGeometryInference`
+- `window.VibeMolUFFAdapter`
+- `window.VibeMolAutoHydrogen`
+- `window.VibeMolAutoIso`
+- `window.VibeMolCloudRendering`
+- `window.VibeMolBondEditing`
+- `window.VibeMolEditUi`
+- `window.VibeMolEditToolUi`
+- `window.VibeMolDisplayWindows`
+- `window.VibeMolFloatingPanels`
+- `window.VibeMolAppearanceUi`
+- `window.VibeMolAppearanceModel`
+- `window.VibeMolAppearanceEditor`
+- `window.VibeMolLooks`
+- `window.VibeMolLooksUi`
+- `window.VibeMolStyleStudio`
+- `window.VibeMolPrefs`
+- `window.VibeMolEditPlacement`
+- `window.VibeMolEditTools`
+- `window.VibeMolEditGizmos`
+- `window.VibeMolEditTransform`
+- `window.VibeMolEditGestures`
+- `window.VibeMolEditHalo`
+- `window.VibeMolPresetModule`
+- `window.VibeMolStructureTransport`
+- `window.VibeMolSessionFormat`
+- `window.VibeMolSessionModule`
+- `window.VibeMolSessionRecovery`
+- `window.VibeMolFileLoader`
+- `window.VibeMolSymmetry`
+- `window.VibeMolSymmetryPanel`
+- `window.VibeMolTrajectoryVideo`
+- `window.VibeMolSceneGraph`
+- `window.VibeMolSceneSources`
+- `window.VibeMolSceneExport`
+- `window.VibeMolSceneOutliner`
+- `window.VibeMolArithmeticGrid`
+- `window.VibeMolArithmeticRunner`
+- `window.VibeMolArithmeticLayers`
+- `window.VibeMolGridStore`
+- `window.VibeMolVibration`
+- `window.VibeMolTrajectoryClock`
+- `window.VibeMolTrajectoryPlayback`
+- `window.VibeMolTrajectoryUi`
+
+Preset automation contract exposed globally:
+- `window.VibeMolPreset.kind`
+- `window.VibeMolPreset.version`
+- `window.VibeMolPreset.listKeys()`
+- `window.VibeMolPreset.export(options?)`
+- `window.VibeMolPreset.import(preset, options?)`
+
+## Key Behavior Notes
+- A pending session-recovery choice defers automatic restoration of saved Workbench windows. It never hides panels opened in the current workspace (including Subspace on entering Calculations); menu checkmarks and dock visibility use the same live panel state. Opening a panel does not accept/dismiss recovery or overwrite its snapshot. `tests/e2e/measurements.py` covers this with new work loaded while recovery remains pending.
+- Calculations is Workbench's fourth mode. It temporarily hides ordinary surfaces/clouds, frames atoms, pauses playback, and offers Subspace / π planes / Clear. Shared inspectors remain available; other analysis panels suspend. Selections use stable atom IDs, live per structure, and persist in sessions/recovery. Shell and component states are mutually exclusive; p/d expose CCA components, f/higher whole shells only. Planes require whole p shells, at least three non-collinear atoms and RMS ≤0.100 Å; shared normals are averaged. Cached/instanced contracted cc-pvtz-minao previews use Look phase colors and include camera-depth bounds. GHF doubles generated counts once. No SCF or AVAS runs in the browser. Legacy launch keeps three modes.
+- Calculations' Total active count defaults to the selected spin-free subspace dimension after π-plane constraints. Editing it pins a manual value; Use selection count resumes automatic updates. Sessions retain this choice, and older explicit totals remain manual. `VibeMolCalculations.configure({total: n})` pins the count; `{totalFollowsSelection: true}` resets it. Occupied/virtual split remains explicit, and cumulative remains the default selection method.
+- AVAS shell menus expose occupied/core shells, complete outer s/p and next s/p shells; occupied 3d adds 4d. C offers 1s/2s/2p/3s/3p; S adds 3s/3p/4s/4p to the Ne core; Fe offers 1s/2s/2p/3s/3p/4s/3d/4p/5s/4d/5p in filling order. This supersedes the earlier d-only transition-metal restriction. Menus use full cc-pVTZ and group intersections. Existing cc-pvtz-minao choices remain until an unavailable shell is selected, which switches that record to cc-pvtz; preview coefficients, cache keys, counts, basis field, input and session state stay consistent. Explicit incompatible basis changes block input instead of dropping assignments. Raw catalogs retain legacy assignments outside the new menu limits. Bundled coverage remains H–Ar and Ca–Kr.
+- Calculations supports RHF, ROHF, and GHF. Spin projection `ms` is enabled only for ROHF, retained per structure/session, and validated for half-integer steps, electron parity, and `|ms| ≤ nel/2`. ROHF input targets the matching high-spin CI state (`S = |ms|`, multiplicity `2|ms|+1`). AVAS counts remain spatial and are additional to the automatically included singly occupied orbitals; the panel labels/explains this. The current forte2 signed-ms limitation for separate counts is checked before export. See `docs/calculations.md`.
+- Calculations atom focus is separate from AVAS assignments: clicks never assign or remove shells. `calculations-picker.js` provides the movable Atomic orbitals popup for one atom or a same-period group, using the intersection of supported MINAO shells. Group edits show mixed states and enforce whole-shell/component exclusivity. Its compact shell toolbar anchors near the focused atoms, follows camera changes unless manually moved, and resets anchoring for a new selection. Selecting p/d opens a component dropdown beneath that shell; the caret opens it without assigning orbitals. There is no lower information card or deselect button; empty-space clicks clear focus. The toolbar exposes π-plane fitting for at least three eligible atoms. Mixed-period focus suppresses the popup and explains the restriction in Subspace. Assigned AO rows/planes persist in sessions; focused atom IDs and popup layout are transient. Subspace Edit focuses one assigned atom; Remove explicitly removes its orbitals. `VibeMolCalculations.state().selectedAtomIds` reports transient focus; `selections` reports persistent assignments.
+- VS Code molecular editors load supported files directly in the opened file's folder as one batch. `Open Folder in VibeMol` also accepts an Explorer folder or a folder picker. `src/vscode_ext/vibemol/src/folderFiles.js` uses `workspace.fs` and current text documents (including unsaved edits), skips subfolders/symlinks/unrelated JSON/presets/sessions, and reports file failures within 250 MiB per-file / 512 MiB per-folder bounds. `vmWebview.js` shares panel setup and waits for DOM/app readiness before initial loading. Folder loads are snapshots, not filesystem watches. See `tests/unit/vscode-extension.test.mjs`.
+- Independent shadow, camera-depth, picking, performance, and mode fixes have been backported to `main` without the Workbench shell. The experimental branch includes that main baseline; see `docs/core-fixes-backport.md` for source commits, exclusions, and validation commands.
+- Workbench is the default v0.9.0 interface and manages persistent display inspectors through `VibeMolWorkbenchHost`; edit menus and transient dialogs retain their existing behavior. Its existing `vibemol.workbench.lab.v1` layout storage is preserved separately from scientific presets/sessions. Normal launches and old `?workspaceLab=1` links enable appearance defaults/autosave and session recovery. Only explicit `?appearanceStudy=1` or `?workspaceDemo=1` pages skip persistence; the latter loads the bundled methane demonstration into an empty scene. `tests/e2e/workbench_release.py` covers default launch, legacy links, persistence/recovery, startup defaults, and Python renderer styles. The CLI uses the public Look API for style selection, with a DOM fallback for older deployments.
+- Workbench merges Appearance and Style Studio into one Properties inspector (`inspector`) with Object/Look tabs. `properties-inspector.js` builds controls once and updates them in place. Command/Ctrl-click can select the structure and orbitals together; Structure and Surfaces controls apply only to the relevant selected type. Molecule-layer `moleculeDisplay` flags are session state and preserve legacy global defaults when absent. Shared materials, geometry, colors, lighting, and background live in Look; Object color/opacity overrides expose reset-to-look. Workbench layout normalization and window APIs accept `displayInspector` / `styleStudio` aliases; explicit legacy launches keep the original two inspectors. Axes/focus live in Camera; box visibility is per surface; the global 2C control is labelled explicitly. Typeface is available from App settings, separate from Layout. Geist is the default; supported font-pair alternatives intentionally use the same shared tokens. See `docs/experiments/workbench/inspector-consolidation.md` and `tests/e2e/properties_inspector.py`.
+- The Workbench bar separates a View/Measure/Edit radiogroup, contextual commands (including Clear measurements), and one Panels menu. Mode buttons use `aria-checked` with roving Tab focus and wrapping arrows/Home/End; the original launch path retains its existing mode semantics. Build and Symmetry expose expansion; no bar control uses `aria-pressed`. Panels rows show open checkmarks and effective dock locations, including inactive dock tabs. Minimized inspectors are unchecked and restore from their menu row. The menu dismisses on activation, Escape, Tab, or outside click. Menu and dock states derive from the same window/layout projection; no extra persistence is added. `tests/e2e/workbench_bar.py` covers keyboard, ARIA, conditional entries, and bar hit testing/overflow at 320–1920 px.
+- Workbench puts the original View/Measure/Edit selector and stable Build/Symmetry/Optimize actions in its top bar. Coordinates, Camera, and Properties stay available across modes; Quick actions (COM/orientation) are three direct top-bar commands before Panels, disabled without atoms; analysis inspectors suspend during Edit and restore their tabs afterward. Measure has a Clear measurements action. Build and Symmetry use the panel system; desktop bars stay 56 px across modes, with icon-only contextual actions and a keyboard-accessible overflow menu; compact layouts reserve a fixed 96 px. Mode changes preserve Focus, restore the appropriate hint, and retain molecular/session state. Build/Symmetry are Edit-only panels with dock/float/minimize support and saved-layout state; their open choices, Build search, and Symmetry tolerance are restored on return to Edit; transient previews are canceled. In Workbench, search filters without selecting on blur; Enter or a result click commits a Build payload. Workbench `M` enters Measure from View/Edit, while `C`/`V` access shared inspectors and `Q` exits Focus and focuses the first Quick action. Saved layouts drop the retired `viewInspector` panel; legacy launches retain its popup. Explicit legacy launches retain the original mode selector/launcher, with Coordinates available in Edit.
+- Measurements are durable per-record annotations with stable atom IDs, display units/precision, CSV, and independent Undo/Redo; Esc clears the picking sequence only. Measurements is available in View/Measure, suspended in Edit, and excluded from appearance presets. Sessions retain annotations but not their undo history.
+- Workbench keeps the left sidebar dedicated to scene management. Properties launches from Panels. Object contains selected-layer scientific controls; Look contains the single preset selector and named-style editor. Measure temporarily suppresses surfaces/clouds and frames atoms when entering from surface context, with Show surfaces and Frame atoms in Measurements. View restores layer visibility choices; Edit always suppresses surfaces. Mode changes preserve visibility flags, materials, isovalues, and Properties tab choice.
+- The floating question-mark Help button is removed. Help remains available from the sidebar and `?`. The corner axes reserve 16 px above the hint bar within the active canvas, tracking docks and wrapped hints; Focus releases that space when the hint is hidden.
+- All 25 custom floating interfaces use title bars or compact grips for movement, including display/edit windows, operator panels, scene/arithmetic menus, modal dialogs, confirmations, and video recording controls. Manual positions survive close/reopen and scene updates until reload; Alt+arrows move a focused handle and Alt+Home restores anchoring. Native browser dialogs/pickers remain browser-controlled. Floating layout is excluded from presets/sessions/recovery. `floating-panels.js` loads before UI controllers and registers static shells; the outliner registers its dynamic shells.
+- Properties → Object → Structure includes Hydrogen bonds, enabled by default per molecule layer and independent of Show bonds. Explicit N/O/F/S–H donors and suitable N/O/F/S acceptors produce dashed H···A contacts at 1.2–2.5 Å, D···A ≤ 3.5 Å, and D–H···A ≥ 120°. Contacts are annotations only: no chemical topology, valence, UFF, export, or bond-editing changes. The toggle is session state, excluded from Looks; old sessions default on. Geometry changes update contacts, with spatial bins and no idle-frame inference. See `docs/hydrogen-bonds.md` and `tests/e2e/hydrogen_contacts.py`.
+- 2C surface mode is global across loaded 2C files.
+- Molecule styles are: `basic`, `toon`, `kit` (shown as Basic, Toon, and Kit).
+- Rendering presets are selected through the Appearance menu. Number keys do not change rendering in any mode; edit-mode bond-order/style shortcuts remain active.
+- In edit mode, `4` is used for quadruple-bond editing and preview in Add mode.
+- Unsupported molecule styles in saved presets fall back to Basic; the Python CLI rejects unsupported style arguments.
+- `fancy` is treated as a deprecated alias for `toon` in preset/CLI compatibility paths.
+- Python CLI additionally accepts deprecated alias `studio` and maps it to `kit`.
+- Toon molecule style shades surfaces with Toon by default; an explicitly chosen orbital finish overrides it for the targeted layers.
+- Camera rotation uses quaternion orbiting in all interaction modes to avoid pole locking.
+- Camera clipping follows visible atom/bond/surface/cloud bounds with at least 3 Å of padding on each side, growing to 5% of the depth span for large structures. Orthographic depth may extend behind the nominal camera position without changing framing; picking and depth-of-field share that signed range. Perspective clipping stays positive and updates while dollying. Rotation, playback, edits, and session restoration refit depth without computing hidden orbitals.
+- The Edit XY grid is an unbounded projected plane with antialiased 1 Å lines, stronger 5 Å lines, red X/green Y axes, and a smooth perspective distance fade. Its fragment depth preserves atom occlusion while clamping outside the molecular clipping range; it never expands camera bounds. Orthographic views keep the grid continuous when panned or zoomed. `tests/e2e/camera_depth.py` covers grid extent, clipping, and occlusion.
+- Molecular picking compares actual atom and bond intersections by camera depth. Instanced metal-bond dashes use per-bond bounds to restrict triangle tests to candidate instances, including their caps and real gaps. Screen-distance assistance applies only when no physical atom/bond is hit; selected-atom tolerance and sticky bond hints cannot override a physical foreground target. Hover/selection overlays never intercept picking. Pointer handlers and the idle Edit halo share a hit/miss cache keyed by pointer, mode, volume, atom/bond groups, bond revision, viewport, and camera/group matrices; coordinate updates invalidate it, including atom-only edits. Straight-bond fallback converts only two endpoints; multiple-bond plane data is cached per bond-group revision. `tests/e2e/edit_picking.py` covers occlusion, dash gaps, projections, scene shifts, the 2,000-atom NaCl work count, invalidation, and curved/multiple bonds; `tools/profile_nacl_edit.py` records CPU benchmarks.
+- Mode-only surface suppression retains and hides orbital/cloud graphics without rebuilding unchanged molecules; a real rebuild in Edit defers those graphics until return to View/Measure. Closed Coordinates tables populate on opening. `tests/e2e/edit_picking.py` covers mode-only mesh reuse and graphics restoration.
+- Startup opens to an empty scene with onboarding card (sample is no longer auto-loaded).
+- The Scenes `+` menu is initialized at empty startup and offers `Create empty scene` and `From file...`. Empty scenes reuse the editor's new-molecule path, open in Edit mode, retain earlier scenes, and survive session save/open. The file picker accepts XYZ, Cube/Cub/2ccube, and Molden; `newScenes: true` bypasses matching existing scenes while retaining geometry grouping within the selected batch. The Orbitals group retains its targeted `Add cube file...` action. `tests/e2e/premerge.py` covers creation, editing, repeated imports, deferred MOs, cancellation/failure, and empty-scene session restoration.
+- Drag/drop file loading works on both the scene and onboarding card/drop zone.
+- `.xyz` file imports and pasted XYZ text accept either standard XYZ (`natoms`, comment, coordinates) or coordinates-only rows; the first token on each row may be an element symbol or an atomic number.
+- XYZ picker/drop/embed/paste imports share a staged unit check. Structures with at least two atoms and no covalent/metal bond candidates at angstrom distances prompt before scene registration: OK converts all coordinates (including every trajectory frame) from bohr to angstroms; Cancel keeps the coordinates unchanged. The first frame drives the check, single atoms are skipped, and bond visibility/settings do not affect detection. The Python render client dismisses conversion prompts and reports a warning instead of silently rescaling geometry.
+- `Cmd/Ctrl+C` uses the native copy event to copy headerless element/XYZ rows in angstroms: selected atoms in Edit mode, or the active structure otherwise. Text controls and selected page text retain native copy behavior. The Coordinates Copy button copies the full active structure using the same row format; XYZ downloads keep their header.
+- `Cmd/Ctrl+V` imports coordinate text as a new structure, including in a fresh window. A private clipboard token preserves atom/bond duplication for selections copied in the same Edit window; other clipboard content never falls back to a stale selection. Clipboard shortcuts and their modified browser variants do not trigger the plain C/V panel shortcuts.
+- Preset JSON files can be drag-dropped directly into the app and are imported through the normal preset path.
+- Reproducible structure JSON files (`kind: "vibemol.structure"`) can be drag-dropped directly into the app and preserve explicit bonds plus builder annotations.
+- Save session downloads a `.vibemol-session` JSON bundle. Open session, ordinary picker/drop, and embedded loads validate one bundle before replacing the workspace. Sessions preserve source identity/data, edited structures, graph/layer state, arithmetic recipes/results, camera, and playback controls; playback reopens paused in View mode. Undo history, unfinished interactions, and floating-window layout are excluded.
+- Session autosave uses IndexedDB and the same serializer, retains two completed snapshots, and offers explicit recovery on startup. Empty startup and failed writes do not erase prior snapshots. Concurrent tabs cannot overwrite a newer recovery revision silently. Portable numeric data is capped at 256 MiB; autosave at 64 MiB per snapshot. See `docs/sessions.md` for the asynchronous `VibeMolSession`/`VibeMolRecovery` APIs and browser-local persistence limits.
+- Edit Add mode has three submodes: `Atom`, `Fragment`, and `Molecule`.
+- Standalone molecule placement is interactive: click to place, drag to rotate around COM, click again to confirm, `Esc` to cancel, `X/Y/Z` to align preview axes.
+- Fragment/molecule catalog data loads from `assets/fragments/library.json` when available and falls back to built-in starter definitions.
+- In direct `file://` usage, fragment catalog fetch is skipped and built-in fragment defaults are used quietly.
+- Embedded integrations can auto-load files via:
+  - `window.VibeMolEmbed.loadFiles(files, options?)`
+  - `window.postMessage({ type: 'vibemol:load-files', files, options, requestId? }, targetOrigin)`
+  - Response event: `vibemol:load-files:result` with `ok`, `loadedCount`, `loadedNames`, and optional `error`.
+- Vibrational sidecar JSON files can be attached to a loaded molecule (matched by atom count, and atom symbol sequence when provided).
+- ORCA `.hess` files are parsed for `$vibrational_frequencies` + `$normal_modes` and attached using the same matching logic.
+- Dropping an ORCA `.hess` without a same-stem `.xyz` in the same upload batch triggers an explicit warning popup before import continues.
+- Psi4 output logs (`.dat/.out/.output`) accept geometry in angstroms or bohr and convert explicitly declared bohr coordinates to angstroms. The last harmonic analysis uses its reference geometry: the first geometry in a finite-difference computation block, otherwise the last geometry before the analysis. Later displaced geometries and subsequent jobs cannot replace that reference. Format detection is shared in `io-utils.js`, and the geometry reader lives in `parsers.js`.
+- Loading an active Molden file opens the Orbitals floating inspector in display/measure mode. Closing it is respected through redraws; a later Molden import opens it again.
+- Every MO is listed under the scene's Orbitals group immediately on import, initially hidden and without a computed grid. Selecting an MO from the outliner or inspector computes its grid on demand; rendering reuses the bounded grid cache. Passive appearance/menu updates do not compute grids.
+- Clicking an outliner Orbitals header opens Appearance for every cube/arithmetic child in that group, including hidden and deferred MOs. Colors, iso, Auto-iso, opacity, material, phase, and surface/cloud settings apply to all children without eagerly computing grids; differing values show mixed indicators. Group appearance scope is separate from destructive-command selection. Show surfaces toggles group visibility while preserving child visibility flags. Session save/open retains the per-child settings and focused group.
+- Enabling Auto-iso marks unassigned values as pending. Outliner rows omit their `iso ...` label until a successful calculation or manual iso edit assigns a value; disabling Auto-iso alone does not assign one. Pending state survives layer copies and session save/open, without computing hidden MOs.
+- Clicking an Orbitals row shows that MO alone among the active scene's surface layers. Other orbital layers remain in the outliner with their settings and arithmetic dependencies intact; rapid clicks honor the last selection. Grid step/padding edits preserve manually enabled overlays.
+- The non-edit adaptive launcher lives on-canvas above Appearance, shows only context-relevant windows (`Orbitals`, `Quick actions`, `View`, `Coordinates`, `Trajectory`, `Frequencies`), and enforces mutual exclusivity within that launcher set.
+- Vibrational mode controls (mode index, play/pause, amplitude, speed, frequency, hide-small-frequencies toggle) are shown in the Frequencies panel when available.
+- The `Hide small frequencies` checkbox uses a `5.0 cm^-1` absolute-frequency threshold.
+- Trajectory playback and vibrational playback are mutually exclusive for one active file.
+- Trajectory and Frequencies panels both expose `Save video`, which opens a crop overlay over the 3D canvas and exports one cropped WebM pass of the current animation.
+- Outside edit mode, trajectory bond rendering is dynamic per frame and does not mutate stored `vol.bonds`.
+- Bond radius is a requested maximum: each connector is capped to fit its smaller atom, with mesh facets, contours, and joints included. For plain cylinders, double-bond radius is at most `R/2.05`, triple/quadruple at most `R/3.1`, where `R` is the smaller sphere mesh's safe interior radius. Component spacing scales with thickness. Straight end caps use `sqrt(R²-(offset+rimRadius)²)` and live edits recompute the seating. Saved looks retain the requested radius; see `docs/bond-fitting.md`.
+- Hydrogen has one neighbor and order one across covalent/metal styles. The structure core normalizes legacy H orders and surplus neighbors (explicit then closest), and rejects a new neighbor on occupied H. Bond editing disables/rejects higher H orders; saturated-H growth stops before atom insertion. Covalent and metal inference share H capacity; H2 is supported. Explicit H deletion retains its no-adjustment/no-optimization behavior.
+- In edit mode, the `Build` popover is toggled explicitly by the toolbar button or `/`; pressing `/` focuses the Build search field when the palette is already open. The `Symmetry` panel is toggled explicitly by the toolbar button or `S`, which restores an inactive or minimized panel; explicit legacy launches retain its popup.
+- The `Symmetry` tool supports point-group analysis, RMS-based approximate fits, preview/apply/auto-apply symmetrization, and 3D symmetry-element visualization.
+- Appearance is an accordion inspector with a native Preset dropdown for built-in/saved looks, a Style Studio launcher directly below, and the existing Rendering, Atoms, Bonds, Camera, Scene, Surfaces, and Preferences sections. The dropdown and Studio share selection state and Appearance Undo. Geometry/Colors/Material/Lighting & contours/Surfaces controls, Undo/Revert, and preset/material saving live in the Studio popup. Surface and 2C/cloud controls appear only when relevant.
+- Background color is one global canvas setting saved with each look. Style Studio → Lighting & contours → Background and Appearance → Scene → Background share `global.backgroundColor`, including grouped Appearance Undo, Modified/Revert, named looks, exports, autosave, and sessions. Follow UI theme sits beside the Studio background control and darkens only the rendered color in dark mode. Background edits reuse meshes and never compute deferred orbitals. `docs/appearance-audit.md` records the resolved Studio/sidebar, camera, surface-default, and Undo contracts.
+- Studio Colors and Lighting & contours mirror the sidebar palette, element-color toggle/editor, bond color mode/tint, shadows, fog, and fog depth. Native controls and Studio controls use the same Appearance Undo transaction path, including element-color resets and radius multipliers. Depth-of-field edits also support Appearance Undo, but camera/focus/blur settings are excluded from named looks and do not mark them Modified; full presets, appearance autosave, and sessions still preserve them.
+- Look version 4 stores global surface defaults. Studio Surfaces edits default colors/opacity; sidebar Surfaces creates selected-orbital/group overrides. Per-layer `styleOverrides: {colors, opacity}` flags persist through clones, source state, sessions, and recovery. Styles preserve explicit overrides, even when they match the current defaults. Sidebar Use style colors/opacity resets each group separately; Studio Apply defaults to all orbitals clears both globally, with Undo. Saved looks and Modified compare shared defaults, independent of layer selection/overrides. New layers inherit those defaults. Legacy sessions infer overrides from differing local values. Old named look imports drop camera settings; generic full presets keep their broader scope. `tests/e2e/appearance_scopes.py` exercises these rules.
+
+- Material has three families with alphabetized Recipe menus: Physical (Basic/Luminous, Emissive, Gel, Matte, Metal, Opal, Porcelain), Smooth (Phong: Classic, Kit), and Toon (Ink, Toon). `VibeMolLooks.materialFamilies`, `materialPresets` (with family metadata), and `materialRecipe(id)` derive recipes from their Looks. Family changes apply Basic/Classic/Toon as one Appearance Undo step; the Recipe reset restores the entire saved descriptor. Personal recipes appear only in their family. Main controls expose each family's distinctions; secondary channels appear only when active, and Phong has no Reflections control. `materialEqual` and Look Modified ignore dormant shader parameters, with numeric tolerance, while respecting legacy surface/vertex overrides. Full descriptors remain lossless in saves/imports and no schema version changes. Basic uses the approved Luminous recipe (roughness 0.72, metalness 0.04, clearcoat 1, coat roughness 0.1, color fill 0.36). All material edits preserve geometry, colors, contours, and lighting. Retired finishes remain readable in saved descriptors, looks, and sessions. `material_families` in `tests/e2e/looks.py` covers both Properties and Studio.
+- Appearance controls include a `Shadows` toggle for atoms, bonds, and isosurfaces casting and receiving shadows together, enabled by default in every built-in preset and at startup. Explicit saved look/session choices are preserved. It preserves the `molecule.feature.shadows` preset key and reuses existing surface geometry. Surface shadows fade with opacity using filtered texel coverage. The 2048-square shadow map is capped at the device texture limit; its camera fits cached mesh bounds in light space, follows the light rig, snaps its center to texels, and scales bias with texel size. WBOIT shares one complete shadow map across color passes, and alpha/beta split view builds a separate map per pane. Clouds retain their existing behavior. `tests/e2e/surface_shadows.py` runs through `looks.py` and verifies camera coverage, rendered cross-shadows, transparency/fallback, split isolation, visibility, and sessions.
+- Bonds exposes Uniform / By element coloring and its color/tint swatch; Atoms exposes the palette. Uniform coloring also applies to metal connectors and aromatic guides. Straight bonds use one mesh, with no internal midpoint caps even for two element colors. Kit live geometry updates retain vertex colors. Geometry exposes separate atom/metal scales, per-element display radii/reset, mesh detail, and legacy size multipliers. Material exposes exact Toon brightness levels, fill scale/mix, and pearlescence thickness. Contour sizing is explicitly fixed or relative. See `docs/appearance-audit.md` for the preset/control inventory and regression coverage.
+- Color-derived emission follows vertex/instance colors consistently on bonds and phase-colored surfaces; fixed-color fill stays fixed. New shared Gel/Emissive recipes omit legacy vertex-emission suppression. WBOIT and ghost clones use `appearanceModel.cloneMaterial` to retain shader hooks. `material_color_fill` in `tests/e2e/looks.py` compares GPU pixels across uniform, vertex, instance, and cloned shaders for every menu material.
+- Material is closed by default and uses the existing disclosure style. All material controls appear directly inside it; Save material remains a nested disclosure. The legacy Ink outlines and Blackbody coloring toggles/renderers are removed; old preset/session flags are ignored during import. The curated Ink preset still uses the standard material/contour system.
+- Style and Color scheme selectors apply independent components and display stored `{kind,id}` references. Style/sidebar selections preserve atom/bond/orbital/background colors and background theme-following; schemes preserve geometry, material, lighting and contours. Gallery tiles and My looks selection apply complete looks, including colors; a tile stays pressed when both references identify it, including after edits. Both mixing menus reuse built-in/saved appearance recipes. Each row's dot/reset compares only its half against its referenced recipe. Revert composes those baselines without changing references; Undo captures settings and both references. Mixed pairs have explicit labels such as `Opal style · Classic colors`. Object orbital overrides remain independent. Colors contains atom/bond controls, global orbital defaults (also in Properties), and Background/Follow UI theme. `VibeMolAppearanceLooks.apply(id)` preserves colors; `applyColors(id)` changes only colors; `{includeColors:true}` restores a full original combination. `VibeMolLooks.colors/withColors/colorsEqual/styleEqual/baseline` define the shared scope without repartitioning fields. `independent_colors` in `tests/e2e/looks.py` and `tests/e2e/look_tiles.py` cover scope, tiles, Undo and Object isolation.
+- `VibeMolLooks.createReferenceController` owns Style/Color references; live renderer settings remain authoritative. General presets, appearance autosave, sessions and recovery save `appearance.references` plus original referenced user recipe definitions for fresh-browser restoration. Legacy `appearance.look` is import-only for general presets; standalone Export look envelopes still carry the complete recipe under that key. Matching is confined to one-time legacy migration: recorded Style id or unique style match, then color ties favor Style, declared built-in order, and user name order. Ordinary synchronization never infers identities from equal values. Deleted user references become null without changing rendering; renamed references follow their ids; unlisted recipes display disabled real-name options. Save new points both refs at its recipe; Update saved requires the same modified user recipe on both axes. A startup default applies its captured full recipe to both axes. `snapshot()` returns `{styleRef,colorsRef,styleModified,colorsModified,label,settings,saved}`, without `activeLook`. `tests/e2e/look_references.py` and `tests/unit/appearance-references.test.mjs` cover identity, per-axis resets, aliases, deletion, nulls, migration and persistence.
+- Surface opacity is edited in `Surfaces`, scoped to the selected orbital or focused Orbitals group, including hidden/deferred MOs. Mixed values are shown; slider drags form one Appearance Undo step and reuse surface geometry, materials, and WBOIT pass materials. WBOIT alpha uniforms exist before shader compilation and are shared across shader variants to prevent a fully opaque first-frame flash. Material has no opacity control. Real atoms/bonds (including aromatic and metal connectors) stay opaque; old `molecule.opacity.atom` and `molecule.opacity.bond` keys are ignored in strict/relaxed preset and session imports and omitted from exports. Transient edit previews and decorative highlights retain their own opacity.
+- Style Studio offers alphabetically sorted Basic / Classic / Ink / Kit / Opal / Porcelain / Toon previews and a preset menu, My looks, and independent Geometry, Colors, Material, Lighting & contours, and Surfaces controls. Material selections and edits apply to atoms, bonds, and all surfaces; there are no material target, linking, or separate Finish/Shading controls. Basic uses one Luminous material for atoms, bonds, and surfaces. Older saved pairs retain their explicit descriptors; only those show Use surface finish everywhere. It reuses existing inspector components. Look and material libraries support named saves, update/delete, portable import/export, and exact settings; full looks also support a startup default and Revert. Appearance Undo groups slider drags and is separate from molecular edit undo. Material/light edits reuse geometry; shape edits rebuild molecule display meshes only. Looks preserve coordinates, topology, camera, visibility, isovalues/Auto-iso, phase, and render mode, and never compute deferred MOs. Material edits apply globally, including to hidden/deferred orbitals and future sources; orbital colors and scientific properties retain group/selected scope. Rendering version 3 stores the shared material and an optional surfaceMaterial descriptor for older saved appearances; missing/null surfaceMaterial uses the shared finish, and v2 slots migrate to the atom base material. Saved light rigs include key/rim directions and tone mapping. Exact settings survive presets, autosave, and complete sessions. See `docs/appearance-looks.md` and `tests/e2e/looks.py`.
+- The experimental `Enamel` surface material gives opaque orbital figures compact highlights, a small colored fill, and no environment reflections. Native blue/orange Emissive, Enamel, and Satin presets and actual renderer previews live in `docs/experiments/style-lab/`; the original six-look lab keeps its separate study format. `compare.html` uses real app frames to compare full looks or materials only; Basic/Toon/Kit/Classic/Porcelain/Ink/Opal are approved; Nocturne and Atelier remain experimental. Studio presets retain the original Lab lighting, environment reflections, display radii, and ACES tone mapping (Classic uses no tone mapping). Study frames skip normal autosave/default/recovery behavior.
+- Loaded `.2ccube` files expose the 2C quantity selector in Appearance with math-aware labels (`Re(ψ^α)`, `Im(ψ^β)`, and so on).
+- In `alphaBetaPhase` split view, the canvas overlays centered `α` / `β` labels and exposes a `Spinor info` popover whose copy follows the active 2C quantity; the phase wheel sits at the lower-right above the hint bar.
+- Quick actions include `COM → Origin`, camera targeting to COM, and principal-axis alignment. The bottom-left axis gizmo provides +X/−X, +Y/−Y, and +Z/−Z camera views in every mode, including empty scenes. Positive axes use the original shaded arrows and labeled filled endpoints; negative axes use translucent segments and unlabeled flat outlined endpoints. Negative shafts end at the projected circumference of their white-filled rings, including the cylinder cap extent, so they touch rather than enter the circles. Markers establish depth before translucent shafts render for correct occlusion against other axes. Projections overlap naturally without displacement, and the frontmost endpoint receives pointer input; covered endpoints remain keyboard-accessible. Native buttons support touch, one Tab stop, arrows/Home/End, Enter/Space, and Escape. Snaps preserve target, distance, projection and zoom, stop auto-rotation, and change no atoms or selection. +X places positive Y to the right and positive Z up. Camera’s Axes toggle hides both the drawn widget and hit targets; PNG/video retain its lines and labels. `tests/e2e/axis_gizmo.py` checks input, state isolation and responsive placement. Shortcut `R` shifts active molecule center of mass to origin.
+- `View` and `Coordinates` are separate floating windows launched from the adaptive non-edit menu; the coordinates window can toggle between angstrom and bohr display and supports inline atom editing in Edit mode only.
+- Malformed file imports (`.xyz`, `.cube`, `.2ccube`) are surfaced via popup errors.
+- Multi-frame `.xyz` files are parsed as trajectories and can be animated from the Trajectory panel controls.
+- Autoiso caches per file/component/orbital and falls back to synchronous estimation when the worker path is unavailable.
+- Surface hover metrics are shown only for normalized orbital-like grids (`∫q² dV ≈ 1`) and are cached per surface.
+- Standard and 2C isosurface normals are derived from scalar-field gradients rather than triangle-averaged face normals, which keeps shading stable across browsers and material styles.
+- Transparent isosurfaces use weighted blended order-independent transparency (WBOIT) when supported; unsupported renderers fall back to the simpler transparent path without changing the UI contract.
+- Cloud rendering supports both `Cubes` and `Points`; cloud transparency uses the same WBOIT pipeline as surfaces when supported and falls back transparently when it is not.
+- Preset import supports `strict` and `relaxed` modes and preserves unknown keys for round-trip safety.
+- Preset `extensions.builder.fragmentOpsByFile` stores fragment-builder operation logs and restores them on load; replay is not implemented yet.
+- Scene teardown performs deep, deduplicated GPU resource disposal.
+
+## Python API Notes
+- Primary script: `api/vibemol_client.py`.
+- Notebook helper: `vibemol(...)` returns/displays an iframe embed and auto-loads provided files via postMessage.
+- Supports single-file mode (`input_file output_png`) and batch mode (`--inputs ... --output-dir ...`).
+- Supports wildcard expansion in both `--inputs` and `--extra-file`.
+- `--extra-file` uploads additional sidecar files in the same request (for example `.vib.json` with `.xyz`).
+- Runtime preset API (`window.VibeMolPreset`) is preferred; DOM fallback is used only when runtime API is unavailable.
+- DOM fallback import/export includes newer settings:
+  - `surface.enabled`
+  - `surface.autoIsoEnabled`
+  - `surface.colorScheme`
+  - `global.showAtomLabels`
+  - `global.showMultiBonds`
+  - `vibration.hideSmallFrequencies`
+- Client listens for page alert dialogs after upload and surfaces import failures as CLI errors.
+- Style compatibility in CLI:
+  - `fancy` -> `toon`
+  - `studio` -> `kit`
+
+## Edit / Builder UX Status
+Implemented:
+- Edit mode opens in gesture-first editing by default; the legacy adaptive tool window remains visible as the advanced/fallback surface.
+- Edit tools currently include `Selection`, `Move`, `Rotate`, `Add`, `Bond`, and `Transform`; atom deletion is handled directly by `Delete` / `Backspace`.
+- The old gesture HUD has been removed; current edit state is conveyed through the floating cue row, popovers, and transient previews instead.
+- The `Build` palette is the source of truth for the currently loaded atom/fragment/molecule payload; it is opened by the toolbar button or `/`, and `/` focuses the Build search field when the palette is already visible.
+- The Build palette exposes atoms, fragments, and molecules plus element-specific coordination and `Adjust hydrogens` behavior for single-atom placement.
+- In Workbench, Build is an Edit-only panel (`buildPanel`) with right/bottom docking, floating, minimization, named-layout persistence, and a fixed header over a scrollable body. The Build button and `/` reveal inactive/minimized tabs. Payload selection keeps the panel open and focuses the canvas. Mode changes hide it without losing its open/closed/minimized choice or search; transient placement previews still cancel. Search/payload are not part of saved layouts. Legacy `?workspaceLab=0` keeps the close-on-selection popup. `tests/e2e/build_panel.py` covers both paths.
+- Layer 2 context halo is active in gesture mode:
+  - selecting one atom shows a chemistry-aware halo immediately
+  - hovering one atom while idle for ~300 ms shows the same halo
+  - main-group halo geometry is derived from explicit bond orders via `bond order -> lone pairs -> steric number -> VSEPR parent geometry`
+  - open-site grow ghosts and replaceable terminal-H targets are gated by the selection `+` build cue rather than shown continuously
+  - transition metals show first-pass coordination ghosts when build targets are enabled
+  - floating coordination labels set a forward-looking preferred parent geometry for incomplete atoms
+  - clicking a ghost or replaceable-H target places the currently loaded Build payload at that exact site
+- The selection cue row supports translate/rotate, coordination, metal-bond mode, bond order/style, build (`+`), and delete actions.
+- The `+` selection cue arms build targets for the currently loaded atom or fragment and is the normal way to expose open sites on a selected atom.
+- Edit-mode ghost atoms and placement previews reuse the active molecule style shading, but render as semi-transparent previews (about `0.6` opacity) instead of using a separate ghost-only shading model.
+- Gesture-first editing currently supports:
+  - click void to place the loaded element when nothing is selected, or clear selection when atoms are selected
+  - click atom to select it
+  - drag from an unselected atom into void to grow chemistry
+  - drag from an unselected atom to another atom to create/update/delete a bond
+  - Transform left-click selects a bond center or either attached side; Build with an atom loaded cycles bond order
+  - drag from a selected atom to move the resolved move scope
+  - `Alt+drag` to force atom-only movement
+  - `Shift+drag` from a bond to move the downstream side
+  - wheel or `1/2/3` during grow/bond drags to change the pending bond order
+  - In both Build and Transform, right-click never selects or edits; right-drag (including Shift-right-drag) rotates the scene from atoms, bonds, or void, preserving selection and pending placement previews
+  - Switching to Transform retains the loaded Build payload; returning to Build or arming the selection's open-site cue restores that atom or fragment without reselecting it in the palette
+- Selection supports click-to-replace, `Shift+click` toggle, empty-click clear, and `Cmd/Ctrl+A` select-all.
+- Selection mode supports screen-space marquee box selection of atom centers.
+- `Esc` clears the current edit selection when something is selected.
+- Pressing `Space` in edit mode previews missing hydrogen placement for the current atom selection, or for the full active editable structure when nothing is selected; pressing `Space` again commits the previewed hydrogens.
+- Translate selection supports single-atom and multi-atom movement, a right-side XYZ displacement operator panel, and red X / green Y / blue Z arrows anchored at the selection center. Arrow hover and dragging work for a single atom; only that selection moves, with normal undo/redo. Rotate gizmos still require multiple atoms; bond-side transforms retain their own controls.
+- Translate selection also exposes absolute editable X/Y/Z fields below the floating selection actions. Single atoms show their position; groups show the mass-weighted center of mass. Fields always use angstroms, independently of camera shifts or native file units. Enter or blur commits one undoable axis translation; Escape cancels the draft. Unchanged/invalid input and stale selection drafts never move atoms. The popup stays anchored while typing; Rotate/Build and bond-specific controls hide these fields. `tests/e2e/edit_picking.py` covers the fields in both interfaces, unit conversion and rigid group movement.
+- Rotate mode supports multi-atom selection rotation, a right-side XYZ rotation operator panel, and a 3-axis broken-ring rotation gizmo anchored at the geometric selection center.
+- Add tool includes cursor-relative placement with automatic angle snapping (`180°`, `120°`, `109.5°`, `90°`, `60°`).
+- Hold `Shift` during add-grow placement to bypass angle snap.
+- Add mode includes `Atom`, `Fragment`, and `Molecule` submodes.
+- Add atom uses a right-side last-operation operator panel with live XYZ editing plus `Enter` confirm / `Esc` cancel.
+- When `Adjust hydrogens` is enabled, committed single-atom adds perform local hydrogen adjustment automatically and respect the active coordination choice for the newly added atom.
+- Fragment insertion uses the shared fragment catalog and supports starter-group attach flows (for example methyl and hydroxyl geometry overrides).
+- Standalone molecules can be placed by click/drag/click with quaternion rotation around the preview COM.
+- Standalone molecule placement includes a right-side operator panel with live XYZ/rotation editing and axis-align actions.
+- Transform mode is the advanced bond-aware rotation tool: it supports bond hover, bond-side selection, additive selection, explicit rotate-fragment and rotate-bond actions, and post-transform cleanup.
+- Replacing an atom with a lower-valence element prunes excess bonds, preferring terminal hydrogens/terminal one-valence neighbors first, then runs local hydrogen repair on the surviving center.
+- Deleting atoms cascades to dangling one-valence neighbors and then repairs hydrogens on surviving frontier atoms in the same undo unit. Explicit hydrogen-only deletion removes just the targeted hydrogens, preserves all remaining coordinates, and skips automatic hydrogen repair/relaxation regardless of `Adjust hydrogens`; the setting itself stays unchanged.
+- In Edit/Build with an atom loaded, hovering anywhere on a bond highlights every complete carrier and left-clicking cycles its order `1 -> 2 -> 3 -> 4 -> 3 -> 2 -> 1`; Transform left-click selects bond centers/ends without changing order. Bond selection for cue-driven edits belongs to Transform left-click. `tests/e2e/build_bonds.py` covers full-bond highlighting, Build-only cycling, undo/redo, and hydrogen limits; `tests/e2e/transform_selection.py` covers Transform left selection and right-drag orbit in both camera projections.
+- Edit undo/redo history is active (`Cmd/Ctrl+Z`, `Cmd/Ctrl+Shift+Z`).
+- Direct delete via current selection or hovered atom (`Backspace`/`Delete`) is active.
+- Bond tool creates bonds by clicking two atoms, edits order through an in-scene popup (`1–4,0`) for ordinary bonds, edits metal bonds through a style popup (`1 = covalent`, `2 = coordination`, `3 = dative`, `0 = none`), includes a reviewed `Clean Up Bonds` preview/apply workflow for perceived bonds, and offers `Optimize Structure` for one whole-structure UFF coordinate cleanup pass.
+- Structures now persist explicit/perceived/suppressed `vol.bonds` with `{ id, a, b, order, kind, origin, style }`, where `style` is one of `covalent`, `metal-strong`, `metal-dative`, or `metal-metal`, and `kind: 'blocked'` records user-suppressed pairs that must not be auto-perceived back into existence.
+- `vol.annotations.coordination.byAtomId[atomId].geometryId` is a preferred coordination target for incomplete atoms, not authoritative stored hybridization.
+- `vol.annotations.metalBonding.byAtomId[atomId].mode` stores per-metal override mode (`auto`, `force_covalent`, `force_dative`, `no_bonds`) for coordination-bond inference.
+- The `Symmetry` tool is available in edit mode, supports point-group analysis, RMS-based candidate filtering, preview/apply/auto-apply symmetrization, and 3D symmetry-element rendering.
+- `Save Structure` exports the active editable record as a reproducible `vibemol.structure` JSON document.
+- `tests/e2e/smoke.py` is the required automated regression check for edit-mode flow changes (adaptive menu, Build-search hotkeys, selection, move/rotate gizmos, add-atom/add-molecule operators, structure round-trip, bond popup editing, cleanup preview/apply, UFF structure optimization, trajectory playback, trajectory/vibration video export behavior, and WBOIT surface-transparency activation/fallback behavior).
+- Atom labels and atom numbers can be toggled independently.
+- New untitled editable files can be created from the toolbar and duplicated/removed from the active-file control area.
+- Coordinates-window rows mirror atom hover, and the table supports inline editing of atom order, element symbol/atomic number, and Cartesian coordinates with validation in Edit mode only. Every row offers Copy (headerless element/XYZ in angstroms, regardless of display units); Edit also offers Delete through the standard undoable atom-deletion path, including hydrogen-only removal semantics. View/Measure show read-only cells and retain copy, units, and export. Row actions resolve stable atom IDs after any pending inline edit. `tests/e2e/mode_consistency.py` covers both ordinary and Workbench windows, clipboard round-trips, row targeting, and Undo/Redo.
+
+Remaining work and priorities are tracked in [the product roadmap](docs/roadmap.md).
+
+- Complete session save/open and browser autosave/recovery are implemented on `codex/session-save-recovery`, pending merge review. The next product improvement after that merge is bounded local heavy-atom relaxation and builder reliability. Appearance autosave, preset builder logs, and single-record structure export remain complementary tools.
+- Catalog fragment/molecule kinds, atom/fragment/molecule placement, append/replace-H attachment, supported ring fusion, builder group metadata, and group-aware transforms are implemented. Remaining builder work is chemistry validation, clearer scope/pivot/placement feedback, and broader fusion cases.
+- Local heavy-atom relaxation after attachment/substitution remains open. Reviewed bond cleanup, hydrogen repair/local hydrogen-only UFF relaxation, and whole-structure UFF optimization are implemented.
+- Complete workspace restoration and replay of builder operations are separate tasks; restoring stored operation logs does not replay them.
+- Recent-session access, broader analysis/export workflows, and integration/performance hardening follow the roadmap order.
+
+## Bond Order Inference Algorithm
+Bond perception lives in `assets/app/js/bond-inference.js`.
+
+Persistent imported topology is now **connectivity-first with metal-aware coordination styles**:
+
+1. Nonmetal raw candidate generation (`collectRawBondCandidates`):
+- Only a supported organic/main-group allowlist is auto-bonded:
+  - `H, B, C, N, O, F, Si, P, S, Cl, Br, I`
+- Metal-containing pairs are handled in a separate pass.
+- Candidate pairs must satisfy:
+  - `0.4 Å <= d(i,j) <= 1.15 * (r_cov(i) + r_cov(j))`
+
+2. Distance-ranked greedy acceptance (`acceptBondCandidatesByDistanceRank`):
+- Sort candidates by increasing `d(i,j) / (r_cov(i) + r_cov(j))`.
+- Accept shortest candidates first.
+- Each accepted edge increments per-atom coordination counts.
+- Each element has a hard maximum coordination cap:
+  - `H 1`, `B 4`, `C 4`, `N 4`, `O 2`, `F 1`, `Si 4`, `P 5`, `S 6`, `Cl/Br/I 1`
+
+3. Metal-aware passes:
+- Metal-ligand pairs use an empirical metal-bond radius table plus ligand covalent radius.
+- Accepted metal-ligand edges are classified as:
+  - `metal-strong` when `dist <= 1.10 * (rM + rL)`
+  - `metal-dative` when `dist <= 1.30 * (rM + rL)`
+- Metal-ligand candidates are capped per metal by a metal-specific coordination-number limit.
+- Metal-metal edges are detected in a separate tighter pass and stored as `style: 'metal-metal'`.
+
+4. Persistent graph semantics:
+- Geometry-based inferred bonds are stored as:
+  - `order: 1` for metal styles and single-bond connectivity
+  - `kind: 'normal'`
+  - `origin: 'perceived'`
+  - `style: 'covalent' | 'metal-strong' | 'metal-dative' | 'metal-metal'`
+- User-authored or imported explicit bonds use:
+  - `origin: 'explicit'`
+- User-suppressed pairs are stored as:
+  - `kind: 'blocked'`
+  - `origin: 'explicit'`
+- `kind: 'blocked'` records are not rendered and prevent later geometry-based re-perception of that pair.
+- Bond-tool edits always create/upgrade bonds to `origin: 'explicit'`
+
+5. Imported bond-order promotion:
+- Imported molecules can promote nonmetal covalent single-bond connectivity to higher bond order where `inferBondOrders(...)` supports it (for example carbonyl-style double bonds).
+- Builder-created/edit-session bonds are not globally reinterpreted this way; they remain under explicit edit control.
+
+6. Metal override behavior:
+- `vol.annotations.metalBonding.byAtomId[atomId].mode` can force metal inference for one atom to:
+  - `auto`
+  - `force_covalent`
+  - `force_dative`
+  - `no_bonds`
+- Metal-ligand bonds count toward the metal-side coordination budget but do not count against the nonmetal ligand-side valence in geometry and auto-hydrogen planning.
+
+7. Cleanup workflow (`classifyBondCleanupDiff`):
+- Computes a reviewed diff between the current graph and the current geometry.
+- Produces:
+  - `additions`: newly perceived bonds not in the graph
+  - `removable`: stale `origin: 'perceived'` bonds
+  - `warnings`: `origin: 'explicit'` bonds that current geometry would not auto-perceive
+- Cleanup apply never auto-removes explicit bonds.
+
+8. Render-time aromatic display (`inferAromaticSixRings`):
+- Benzene-like six-member carbon rings are normalized to alternating single/double order for rendering only.
+- This does not overwrite stored `vol.bonds`.
+
+9. Trajectory rendering:
+- Outside edit mode, trajectory playback uses a transient per-frame perceived bond graph for rendering.
+- Stored topology is unchanged and remains the graph exported by `Save Structure`.
+
+## Commands
+Run web app locally:
+- `python3 -m http.server`
+- Open `http://localhost:8000/`
+
+Local test entrypoints:
+- `make check`
+- `make test-unit`
+- `make test-e2e`
+- `make test`
+
+Fast JS syntax checks:
+- `node --check assets/app/js/fragments.js`
+- `node --check assets/app/js/parsers.js`
+- `node --check assets/app/js/rendering.js`
+- `node --check assets/app/js/interaction.js`
+- `node --check assets/app/js/ui.js`
+- `node --check assets/app/js/structure.js`
+- `node --check assets/app/js/volume-geometry.js`
+- `node --check assets/app/js/volume-2c.js`
+- `node --check assets/app/js/bond-inference.js`
+- `node --check assets/app/js/auto-hydrogen.js`
+- `node --check assets/app/js/autoiso.js`
+- `node --check assets/app/js/cloud-rendering.js`
+- `node --check assets/app/js/preset.js`
+- `node --check assets/app/js/structure-transport.js`
+- `node --check assets/app/js/file-loader.js`
+- `node --check assets/app/js/bond-editing.js`
+- `node --check assets/app/js/edit-ui.js`
+- `node --check assets/app/js/display-windows.js`
+- `node --check assets/app/js/appearance-ui.js`
+- `node --check assets/app/js/edit-state.js`
+- `node --check assets/app/js/edit-placement.js`
+- `node --check assets/app/js/edit-tools.js`
+- `node --check assets/app/js/edit-gizmos.js`
+- `node --check assets/app/js/edit-transform.js`
+- `node --check assets/app/js/edit-gestures.js`
+- `node --check assets/app/js/symmetry.js`
+- `node --check assets/app/js/trajectory-video.js`
+- `node --check src/prefs.js`
+- `node --check assets/app/js/app.js`
+
+Python API setup:
+- `python3 -m venv .venv`
+- `source .venv/bin/activate`
+- `pip install -r api/requirements.txt`
+- `python -m playwright install chromium`
+
+CI:
+- GitHub Actions workflow: `.github/workflows/ci.yml`
+- `checks-and-unit` runs `make check` and `make test-unit`
+- `e2e` runs the two-run characterization gate and all 37 browser suites; the CI browser gate requires 34 passing / 3 failing / 37 and accepts only the three specified production-defect workflows. It uploads all `out/test-artifacts/` evidence.
+
+Python API smoke run:
+- `python api/vibemol_client.py assets/data/sample.cube out/sample_toon_cli.png --style toon`
+- `python api/vibemol_client.py assets/data/sample.cube out/sample_kit_cli.png --style studio`
+- `python api/vibemol_client.py assets/data/sample.xyz out/sample_vib_cli.png --extra-file assets/data/sample.vib.json`
+
+Fragment tooling:
+- `python tools/reorient_fragment_xyz.py input.xyz output.xyz`
+- `python tools/sync_fragment_library.py`
+
+Repo checks:
+- `git status --short`
+- `git diff --stat`
+
+## Editing Rules For Agents
+- Keep controls stationary on hover: use color, background, border color, or shadow feedback without changing their position, size, or rotation. Hover-revealed menus fade in place. Preserve transforms needed for positioning or explicit state changes, such as accordion chevrons and toggle thumbs.
+- Prefer editing `assets/app/js/` modules over large inline script blocks in `index.html`.
+- Preserve script load order and global contracts in `index.html`.
+- Prefer extending `assets/fragments/library.json` + `assets/fragments/*.xyz` for catalog growth instead of hard-coding new fragment geometry in `app.js`.
+- Keep preset key stability across web and CLI integrations when possible.
+- If adding a new user-facing setting, register it in preset import/export (`presetSettingRegistry`) unless intentionally excluded.
+- If changing fragment-builder data, verify both runtime catalog loading (`fragments.js`) and preset builder extensions still round-trip.
+- Do not modify vendored libraries unless explicitly requested:
+  - `assets/vendor/js/three.min.js`
+  - `assets/vendor/js/orbit-controls.global.js`
+  - `assets/vendor/js/isosurface.bundle.js`
+- Keep heavy computation out of the frame loop.
+- Ensure geometries/materials/textures are disposed on teardown/rebuild paths.
+
+## app.js Refactor Characterization
+
+- **Hard constraint 1 — runtime format:** Preserve no bundler, classic scripts and the `window.VibeMol*` contracts. `index.html` loads a fixed ordered list directly, with no build step; ES modules would break that loading contract. The Stage4 tree has83 local script tags; after the three Stage5 modules the list has86 (87 including external analytics). A self-contained HTML exporter remains an **unbuilt feature**, described in a September specification and eligible for0.11+; it is not part of0.10.0 and supplies no release gate. The earlier premise that an exporter concatenates these scripts was incorrect. The VS Code copier copies `assets/` wholesale; a native webview load is optional insurance only.
+
+- **Standing assertion diagnostics rule (2026-10-17):** An assertion that can fail without logging its comparands is a defect in the test. When a suite fails in a way the log cannot explain, instrument it **before re-running**. Log actual and expected values for every independent condition, together with the relevant resolved state, before either assertion can abort; split compound assertions where necessary. Emit the evidence on both success and failure. Preserve the original expected values, readiness conditions, waits and failed run; do not substitute polling, extra sleeps, retries or a relaxed assertion for the measurement. Use the same instrumented harness on tagged base, integration control and proposed source when applying rule 1. Diagnostic results remain separately identified from ordinary merge-gate evidence.
+- **Stage 4 PubChem is complete through PR #24**, with the directly authorized ordering correction: inert construction immediately after `els`, original queries/listeners and **13 used dependencies**, tracked app lets **265 → 262**. Corrected head `d2f1958302632666d66d91a6ea3e23440fc49501` passed its own first automatic ordinary CI **39071994182 attempt 1**: **34/3/37**, all37 once, **102 unchanged goldens twice/exact repeat**, fixed **52-slot composition in eight contexts/all minima**, checks **433 JS/29 Python** and WebKit. #11 fired at **trajectory after the second download**; vibration-export reach **False**. Looks completed **both Studio/Properties material paths** in **1892.07s/31.53min**; no material-preset timeout in this completed run, risk remains open. Whole sharded CI **32.2667min**, **75.73% less/4.120×** versus132.93min. Exact-head merge `a418a284070603b258a8e64f74cfe9746cdbc0a0` matched the tested tree and was pushed before documentation bookkeeping. Original `25fd30a`/CI39057387687 remains a rejected32/5/37 candidate; diagnostic39062919011 and tagged fault injection never supplied a gate. Separate restoration issue **#25** stays carried/unfixed. Evidence: `tests/baselines/evidence/stage4/pubchem/ci-39071994182/`. Stage5 implementation is directly released in the audited 5a → 5b → 5c order; its own gates remain required.
+- Fixed Stage 4 local verification: **1,229** independent source checks; **72 fixed native cases** matching the preserved immutable tagged72 with the exact same harness; instrumented `look_references.py` passed both original migration cases; checks **433 JS/29 Python** passed; **102 unchanged goldens twice**, exact serialized repeat/zero diagnostic pixel changes, fixed **52 slots/eight contexts/all minima** in **1,077.39s**. App **32,669 lines/1,163 direct declarations**, tracked lets **262**; PubChem **13** genuine used inputs, periodic factory **11**. Local evidence: `tests/baselines/evidence/stage4/pubchem/ordering-correction/`. Original 25fd30a evidence remains historical and superseded for acceptance.
+- **Standing inverse construction-order audit:** outgoing free-reference checks are insufficient. For every extraction, inventory every new or changed-kind app binding and new module/helper local binding; enumerate remaining-code reading references, recursively trace the earliest possible calling/escaping context, and compare it with completion of construction. Treat a callback handed to another module as potentially synchronous unless the callee's eager body is independently proved inert. An unresolved pre-construction activation blocks the extraction until proved or re-cut. Run `tools/audit-construction-order.cjs`; its self-test covers direct early calls, cross-module callback escape, corrected order and lexical shadowing. Stages 1–3 and corrected Stage 4 pass; original Stage 4 fails as the negative control. Evidence/configuration: `tests/baselines/evidence/stage4/pubchem/construction-order/`.
+- **Carried 0.9.x issue #25:** startup appearance restore catches callback errors as `console.warn` and returns false to an ignoring caller, without rolling back applied settings or surfacing a user error. A one-shot induced metadata-render failure on tagged `v0.9.5-pre-refactor` leaves identical rendering paired with Basic/Basic modified reference bookkeeping; the untouched control restores Opal/Classic cleanly. Preserve warning stacks and the explicit no-pageerror/no-dialog observation. Generic characterization uses `appearanceStudy=1`, intentionally skipping this path. This independent restore reliability defect is filed, carried and not fixed in the extraction; it does not enlarge CI's accepted failing set. Evidence: `tests/baselines/evidence/stage4/pubchem/restore-fault/`.
+- **Material-preset coverage for run 39057387687 is not covered this run.** Looks stopped at `reference_migration` before either Studio/Properties `material_families` path. Do not describe that as “did not recur” or “no timeout observed”; the coverage was not exercised and the risk remains open. Earlier completed Looks runs retain their own observations.
+- **Stage 5 implementation is directly released after Stage 4 acceptance:** corrected **5a** removes only the two true trajectory shadows with last-record cleanup preserved, then **5b** vibration, then **5c** symmetry. The 17-let inventory holds; vibration’s playing/timestamp pair are authoritative. Preserve continuous vibration phase advancement and its 0.2-second cap alongside the distinct discrete trajectory policy. Broad cuts of **22 inputs each** hit the 20-input design stop; different boundaries project trajectory core **8**, vibration runtime/panel **13**, symmetry panel **11** (optional separate vibration-format **6**). Full dependency lists and retained host responsibilities are in `docs/stage5-seam-design.md`.
+- **Required Stage 5 gates:** One PR each for trajectory playback/scene-clock core (8 genuine inputs), vibration runtime/panel (13), and symmetry presentation (11). Construction-order acceptance is a CI gate, including newly introduced parameters/locals in existing wrappers/callbacks as well as app/module bindings. The current restored34/3/37 exact three-workflow gate, unchanged102-golden twice and fixed52-slot/eight-context/minima conjunction remains required;35/2 is a stop. The direct human #11 rule is stricter for5a/5b: any changed site/shape, disappearance or new failure is a STOP; never adjust the accepted set or retry it away. Accepted5a/5b controls retained `issue-11-stop-after-second-download` at **trajectory**, latest39093054459, vibration export not reached. `tools/check-refactor-run.py` retains explicit strict-signature tests for5a/5b. Its5c policy uses the ordinary trajectory-OR-vibration second-download alternative because5c does not touch exporter sources; other shapes, disappearance and over-performance still stop. Report Looks duration and BOTH Studio/Properties material-family completions on every run; do not equate unexercised coverage with no recurrence.
+- **Historical Stage5a local-freeze checkpoint (now merged as recorded above):** The trajectory core now has8 used inputs,27 original implementations and a constructor completed before startup callback exposure. `trajectoryPlaying` and the write-only `trajectoryLastStepMs` are removed: tracked app lets262→260. A private reference retains the authoritative record/master clock only for last-record cleanup; it copies no playing/timestamp values and is cleared on the empty tick and stop/session paths. Renderer/panel/selection/scene/video orchestration remains in app. Local source, differential, paired-native and construction proof is under `tests/baselines/evidence/stage5/trajectory/`; its own first-pass CI was still pending at that point and subsequently satisfied the human-corrected conjunction before merge. Local verification passed1,220 source checks,109 differential scenarios/2,559 checkpoints, eight matching tagged/proposed native contexts,102 unchanged goldens twice/exact repeat/all52-slot minima in1,047.13s, and a281.07s feature soak in four launch/theme contexts. Checks433 JS/34 Python passed.
+- **Release ordering, corrected by the human:** After all three Stage5 groups pass and merge, run the full four-mode/two-theme/1512–1280–1024 matrix, every fixture and native session save/reload, version0.10.0 and state plainly in What's new that this release contains no user-facing changes. Drop the phantom standalone-export task entirely. The version fields have no behavioral consumer: session/preset compatibility uses their separate schema versions. The human authorizes a release-commit-only expected projection of exactly204 leaves at `session.appVersion` and `session.preset.appVersion`, only0.9.5→0.10.0; require204, residual diff zero and every other comparator unchanged. After shipping, explicitly re-record CI goldens at0.10.0 as a separate step and remove the mapping before0.11 work. Carried product priority is #25 silent partial restore, then #17; #21 is closed as a test-synchronization issue. The residual question is observed sub-frame in all nine foreground CI cases: every actual narrow compositor frame is compact, so no separate product issue is filed. No production defect fix is bundled into the refactor release. **Completed:** 0.10.0 is published; the explicit four-repeat tag recording was promoted and both temporary mapping scopes/helper/tests are removed.
+- **Refuted #11 hypothesis:** duplicated playing/timestamp mirrors do not explain the shared exporter’s false-idle symptom. Trajectory export reads the record/master owner rather than the shadows; vibration has no mirrored pair; shared exporter idle/recording comes from its own `state.mode`, and its `getPlaybackState` option is never called. Record this mechanism as refuted, not a pending hypothesis to revive from matching variable names. The observed #11 product defect remains open; no clock-side-effect fix is claimed.
+
+- Carry **0.9.x #17** alongside #3, #11, axis-gizmo Escape and mode-consistency Coordinates Delete. Its one-click Coordination switching and 390px Metal bounds assertions remain failing. At 390 × 850 the tagged popover is x=12,width=386,right=398; compare the same assertion and geometry on the proposed source and record matching failures as carried. Width 390 is supported/tested: `axis_gizmo.py:147,171` uses 390 × 844 and `build_panel.py:107` uses 390 × 740. Preserve the explicit issue-17 click-away comparison workaround; dismiss-first is not the correct product behavior.
+- **Stage 3 is complete.** All 41 mutable cache conversions (40 accessors plus one canonical alias) are integrated; tracked let count **306 → 302 → 291 → 288 → 275 → 265 → 265**, target **265** met. Symmetry #22 and Colors #23 each passed their own complete first-pass ordinary conjunction before exact-head merges. Colors’ measured factory hand-off is **19 → 18 → 11**: ten used non-DOM inputs plus els. Legacy access and the fixed 52-slot composition remain. One whole-stage boundary soak passed in **630.988 s** across four sustained layout/theme contexts. The mailbox is retired and the monitor remains paused at the direct human request. Stage 4 is separately released as described above; Stage 5 is now released in the audited 5a → 5b → 5c order. Completion evidence: `tests/baselines/evidence/stage3/completion/report.md`.
+- The decomposition starts at `v0.9.5-pre-refactor` (`1c609b338344aaa49ffd11b9ee2ad834a6e0d85d`). Stage 0 moves no production functions; its optional `qa-characterize.js` loads after Workbench only with `?qa=1`.
+- Run `tests/e2e/characterize.py` for the two-run structured determinism gate. Committed captures and validation evidence live under `tests/baselines/`; generated browser output belongs in ignored `out/test-artifacts/`.
+- Characterization compares float leaves with `math.isclose(rel_tol=1e-9, abs_tol=1e-12)` after an exact type check; integers, booleans, strings, keys, lengths and structure remain exact. Same-machine repeats still require exact equality. The initial goldens were recorded on GitHub CI against the tagged original app. The explicitly authorized post-publication refresh records the published v0.10.0 tag; further re-recording requires separate authorization. Metadata records OS, architecture, browser name/version and the CI run. The baseline is expected to hold across machines. `characterization-baseline.yml` requires two independent CI jobs, each capturing twice, to agree exactly before promotion.
+- `browser_suite.py` executes all37 manifest suites once. `--allow-known-defects` and the shipped join require **CI34/3/37**, exactly axis Escape/canvas focus, Coordinates Delete/selection-card interception, and Smoke#11 trajectory OR vibration after the second download, matched by (suite,workflow), never line number. #21 is a closed test-synchronization issue: the width assertion and comparand logging stay; compact=true and a presentation boundary replace the fixed100ms wait, citing diagnostic39129507791. Any additional/different failure or missing accepted failure, including35/2 over-performance, stops. Preserve nonzero defect-suite exits, all37 executions and per-run#11 site evidence.
+- CI runs two independent `characterize.py --matrix-run-index` workers. Each tests all 102 unchanged goldens and four composed identity contexts; only `join_characterize.py` certifies the exact repeat and all eight contexts. Both joins require the same checkout tree, app/QA/golden hashes, CI run and attempt. Missing workers, incomplete inventories and mixed artifacts fail. Checks/unit, browser shards, characterization and WebKit start independently; matrix fail-fast is disabled. Playwright binaries are cached by installed version, OS, architecture and browser; Linux dependencies are still installed. See `docs/ci.md` for timings and artifact layout. This workflow change does not authorize production or golden edits.
+- Selection’s historical complete result was **CI 34/3/37** on #18, run **38989104040 attempt 1**, tested head `518762f`, merged/pushed as `e35da9c`. All 37 suites ran once; both unchanged 102-capture passes and all **52 composed slots in eight contexts** met every firing minimum. #11 fired at **vibration after the second download**; vibration was reached. Checks/unit and WebKit passed. Looks completed both material-families paths in **17.03 minutes**, without timeout. Whole sharded CI was **31.97 minutes** against the **132.93-minute** baseline (75.95% less, 4.16×; one cold-cache measurement). The earlier dark-Calculations `#hint` incomplete is classified as a **flake** under the user's pre-decided 34/3 outcome; no gate, baseline or assertion changed. Earlier Atoms and 43-slot runs remain historical evidence. Let progression: **306 → 302 → 291 → 288 → 275**. Evidence: `tests/baselines/evidence/stage3/selection/ci-38989104040/`.
+- Issue #4 CI follow-up (merged PR #10): full picking passes an unbounded synchronous wait for the applied/presented viewport, preserving both assertions. The shared helper rejects false readiness instead of accepting an async predicate Promise. The unbounded smoke probe rejects a terminal new crop selection; native UI reproduction covers both recording exporters, filed as https://github.com/evangelistalab/vibemol/issues/11. Full normal CI reaches the original vibration failure. Both CI probes use software SwiftShader. Evidence: `tests/baselines/evidence/browser-ci-followup/` and `tests/baselines/evidence/browser-ci-gate/`.
+- The Stage 3 safety net consists of the **34 CI-passing suites** out of 37, including all five Appearance suites and `periodic_table.py`. Smoke remains an executed failing suite for #11; its earlier covered paths still provide evidence. Historical local 35/2/37 is retained with its provenance, never used as a CI gate. The three accepted failures retain their original assertions; closed#21 retains its original overflow comparison with corrected state readiness. The live identity inventory is **52 slots** since Atoms added the nine Element Colors references: Workbench 47 live + 5 issue-backed known-absent; legacy 48 live + 4 known-absent. Scientific/session/geometry/DOM goldens remain CI-recorded, 102 captures twice, with approved float tolerance and exact repeat equality.
+- Stage 1's duplicate audit, metrics and validation are recorded in `tests/baselines/element-utils-validation.json` and `tests/baselines/evidence/stage1/`. Keep the explicitly distinct symbol/clamp policies until a separate behavior-change PR; the extraction preserves all 14 original bodies' observable behavior.
+- The symbol fallback, reversed-range clamp and NaN-coercion divergences are filed together as the separate **0.9.x issue #5**: https://github.com/evangelistalab/vibemol/issues/5. Its worked examples and executable input-path investigation live in `tests/baselines/evidence/stage1-followup/`. CUBE parsers retain fractional Z in intermediates, but supported live-app paths normalize or reject it before the symbol callers; direct low-level API callers can bypass that normalization. The four-argument layout clamp in `workbench-model.js` is known and outside the extraction's four-copy clamp scope, including the cache stage and later extractions.
+- Stage 2's closure audit, metrics and validation live in `tests/baselines/periodic-table-validation.json` and `tests/baselines/evidence/stage2/`. `tests/e2e/periodic_table.py` directly exercises all moved functions and live color-editor workflows and can compare with a tagged archive using `--base-root`. It is included in `make test-e2e` and the **historical local35/2/37, currentCI34/3/37** comparison (gate: **CI34/3/37**); characterization remains a separate 102-capture gate. Its new namespace has one exact export in `characterize-api-additions.json`; Stage 2 preserved the original structured goldens; the separate portability PR subsequently moved their capture home to CI.
+- The original 13 failing baseline workflows and the additional `appearance_controls.py` Properties alias are retained in `tests/baselines/characterize-failures.json` as historical evidence. The issue #4 report records the 12 newly green entry points and the two surviving app defects. Those passing interactions strengthen Stage 3's safety net; generic captures still do not replace the panel manual-verification matrix or close the Looks intermittent. Do not report the two defect suites as passing.
+- Every refactor-stage PR touching a mapped function or its dependencies must include a **Manual verification** section naming the affected suites, the listed workflows, the result on the tagged base and on the proposed change, and the verification evidence. A passing generic characterization capture does not replace this verification. Record any remaining pre-existing defect explicitly.
+- The orthographic preset camera/target projection-refresh defect is a separate **0.9.x bug**, tracked at https://github.com/evangelistalab/vibemol/issues/3. Fix ownership is `afterApplySettings`: refresh the active projection once after a batch touching `view.camera.*` or `view.target.*`. The characterization pin deliberately masks it; passing captures do not prove the ordinary API is fixed. Keep its workaround during the structural refactor and ship the behavior fix separately.
+- Stage 3’s primary metric is mutable module-let reduction **306 → 265**, not app lines. Expected one-time growth: #8 app.js **+148/−39 (+109 net)** and QA harness **+53/−1**; #13 app.js **+85/−85**, line-neutral. After both: 33,037 app lines, 1,181 top-level functions, 291 lets. Record subsequent reference-only changes without treating infrastructure growth as a regression. The appearanceMaterialPreset intermittent **did not recur** in #13: looks.py passed in **24.38 minutes**, full CI in **132.93 minutes**; the risk remains open against later groups.
+- The established roadmap is **issue #4 browser repair → Stage 3 element-cache consolidation (original Stage 4) → Stage 4 PubChem (original Stage 3) → Stage 5 trajectory/symmetry/vibration**, one feature per PR. Stage 3 is complete; Stage 4 PubChem is complete with its corrected candidate; Stage 5 is directly released in the audited 5a → 5b → 5c order, followed by the 0.10.0 release. The established `els` table is available to future authorized extractions.
+- **Stage 3 element-cache consolidation needs the heaviest manual verification.** DOM-cache changes cross the failed panel and Looks/Appearance workflows, including the five independently wired Appearance suites. Stage 5 still has substantial feature coupling, but the cache stage has the weakest existing interaction coverage. The detailed plan and suite mapping live in `tests/baselines/refactor-stage-risk.json`.
+- Split Stage 3 by **prefix/panel group in coverage order**, with a binding inventory and full 37-suite result in every sub-PR. Merge remaining PRs into the pushed `codex/app-js-decomposition` integration branch; soak once at the stage boundary. The accepted pre-code audit (`tests/baselines/evidence/stage3/lookup-site-audit.md`) finds **41 DOM caches: 40 accessors plus one alias**, with corrected let target **306 → 265**. The earlier 313 → 270 figure used the pre-Stage-2 baseline and an unsegmented count. `canvasAdaptiveMenuEl` resolves to the same `els.displayWindowAdaptiveMenuEl` entry as its original source, without a second accessor/query. Keep `calculationsPanel` and `measurementsPanel` as module lets holding controllers, and keep `helpRestoreFocusEl` as focus-restoration state outside els. Use lazy memoized accessors at the original wiring points, preserving priming and listeners. In the first sub-PR, add 43 node-identity assertions (41 real caches plus both controller `.panel` nodes), evaluated after each mode switch, every panel open/close and session restore; a detached node with unchanged ID/ARIA must fail. The completed periodic-table recount is 19 → 18 after excluding the legacy-only launcher input, then 18 → 11 after grouping eight const DOM fields; all ten non-DOM inputs are used. Keep direct event-path verification, both themes, applicable modes, legacy/Workbench launches, responsive docks/floats, focus/keyboard and base/change evidence for affected defect workflows.
+- The Stage 3 prerequisite remains **CI 34 passing / 3 failing / 37** by the exact accepted workflows. Build, adaptive, Atoms, Selection, Symmetry/shared launcher and the separate Colors factory hand-off are integrated, tracked let **265**. Every group requires its own full 37-suite artifact, the issue-backed **52-slot composition** in eight contexts, every reason minimum and 102 unchanged goldens twice. No new controller interface is introduced by a cache conversion; report binding/helper inventory sums separately from extraction inputs. The 41 mutable-cache conversions remain line-neutral and reference-only. The separately human-requested Colors factory regrouping and legacy-only launcher-input exclusion/wiring relocation are recorded separately: app **+1** net line, periodic module **−9**, no new helper/controller or other logic change. All stop decisions defer to the standing conversion rule immediately below. Soak once at the complete stage boundary and report the per-group results once at the end.
+- **Standing conversion rule (2026-10-15):** A failure that reproduces identically on tagged `v0.9.5-pre-refactor` is a carried finding and does not itself block a conversion PR. File it, add it to the carried-defect list, preserve its failing assertion and continue unless one of these three blocking conditions applies: **(1)** a failure present on the proposed source and absent on `v0.9.5-pre-refactor`; **(2)** a gate miss in CI count, failing-set workflow identity, goldens or the identity sweep; **(3)** a conversion that is not behavior-neutral, including a non-line-neutral conversion diff or production edits beyond `let` → `els` and call-site rewrites. Exactly these three conditions block a conversion PR; nothing else stops the sequence. An identical tagged finding does not override a gate miss. The restored CI gate is34/3/37 with its exact three accepted workflows; closed#21 is excluded and35/2 is over-performance and stops; carried findings do not enlarge that accepted CI failing set or authorize production fixes or assertion relaxation.
+- Evidence may be combined across CI runs only when those runs share the **same artifact under test**. Two runs on different trees do not establish a property of a third tree. Harness-only #12 used its own re-evaluated completed run; #8 was rebased onto it and ran CI once. Every cache group needs one CI run on its merge candidate carrying both the complete 37-suite workflow result and the current composed identity inventory with per-reason firing minima (43 original slots for Build/adaptive, 52 slots from Atoms onward). Older identity evidence is historical, never substituted for the candidate's conjunction.
+- Projection #3, axis-gizmo Escape routing, mode-consistency selection-card collision, and video crop #11 belong to the separate 0.9.x production-defect batch, after 0.10.0 or in parallel on 0.9.x. Do not merge those fixes into the refactor. Issue #11 gets one figure-export probe; that probe does not authorize a fix.
+- The cache bridge is mandatory on every non-inject characterization run, including an alternate source root. Only `--inject-harness` may return the historical-source sentinel. Each of the two characterization runs executes the four launch/theme identity sweeps and checks minimum counts for presented checkpoints, mode switches, panel transitions, DOM mutations and session restore. Explicit mode checks must not mask a dormant observer; record actual reason counts in each panel PR. The first Build sub-PR (#8) requires browser CI evidence before merging; a local 35/2/37 result alone does not satisfy that gate.
+- Carry the unresolved Stage 2 Looks timeout at `#appearanceMaterialPreset` as an **open intermittent against Stage 3 element-cache consolidation**, especially Properties/Look bindings. Paired passing replays do not close it. If it recurs there, probe control creation/replacement, cached-node identity, listener/closure references and presented-frame readiness against the tagged source. Apply the standing conversion rule above to classification and stop decisions. Evidence: `tests/baselines/evidence/stage2/looks-investigation.json` and the open risk in `refactor-stage-risk.json`.
+- The axis-gizmo Escape defect involves the capture-phase interception introduced by the **0.9.2/0.9.3 Escape ladder**. Any fix must preserve menu/field cancellation precedence, provisional-placement cancellation, Build disarming while retaining selection, Transform selection clearing, and subsequent Focus/panel dismissal. Keep capture-phase arbitration; restore the intended gizmo-to-canvas focus handoff without dropping the ladder.
+
+## Symmetry diagnostic disposition (2026-10-17)
+
+The direct human assignment retired the local review mailbox; leave `ops/review/` as a record, stop reading replies/updating state, and report directly in chat. The monitor is paused at the human request. Original PR #20 head `537e95f` is preserved, and its run 38994402382 attempt 1 remains failed at 33/4/37. Separately authorized diagnostic CI 39034319620 observed the unchanged `edit_tool` 320px assertion on integration `e35da9c` and Symmetry `537e95f`: both had scrollWidth 442 and clientWidth 12, a hidden overflow trigger, and a hidden menu with zero rows; timestamps since the last fitTools entry were 244.2 ms and 230.8 ms. That measurement was initially carried as issue#21; its product classification is now superseded below. A historical human correction then added its320px workflow as a fourth failure. That classification is now superseded by diagnostic39129507791 and the direct human closure of#21 as a test-synchronization issue; the active gate is restored34/3/37. The diagnostic never supplies merge evidence. Production-identical replacement #22 head `dea1a9b` passed its own first ordinary run 39034824420 attempt 1 with the full independently recomputed conjunction, then merged as `04e01ad`; integration was fetched, fast-forwarded, verified tree-identical and pushed at tracked let 265. GitHub also marked ancestor-head #20 merged at that time; its failed CI remains failed and was not used as a gate. Do not rerun completed Symmetry local verification. Diagnostic and ordinary CI evidence remain separately under `tests/baselines/evidence/stage3/symmetry/`.
+
+Symmetry's accepted run executed all 37 suites once, 34 passing and only the exact three accepted workflows failing. #11 fired at vibration after the second download, and vibration was reached. Both 102 unchanged-golden captures repeated exactly; all 52 slots in eight contexts retained Workbench 47 live + 5 known-absent / legacy 48 live + 4 known-absent composition and every current reason minimum. Actual mode checks were 408/9 (404/6 observer checks beyond explicit calls), presented 39/32, panel transitions 766–1199, DOM checks 2987–5465, restore 1 each. Checks 433 JS/29 Python and WebKit passed. edit_tool passed in 85.45 s without a numeric-width readback. Looks completed both Studio and Properties material paths in 1,299.27 s/21.65 min without the material-preset timeout; the intermittent remains open. Full sharded CI was 1,919 s/31.9833 min vs 132.93 min, 75.94% less/4.156×, eight cold-cache misses, critical balanced-1. Runtime was Linux x86_64, Chromium 156.0.8078.4/Playwright 1.64.0 and ANGLE Vulkan SwiftShader(Subzero). Evidence: `tests/baselines/evidence/stage3/symmetry/ci-39034824420/`.
+
+## Manual Validation Checklist
+After non-trivial changes:
+1. Launch local server and load app.
+2. Verify startup shows the empty onboarding card; test both `Choose files` and `Open sample file`.
+3. Load at least one `.cube`, one `.2ccube`, and one `.xyz`.
+4. Confirm 2C mode selection persists across file switches.
+5. Toggle surface/cloud modes and verify rendering updates.
+6. Check molecule styles (`basic`, `toon`, `kit/Kit`) through the Appearance menu and verify number keys do not change rendering in Display, Measure, or Edit mode.
+7. Enter edit mode and measurement mode; verify quaternion background rotation still works.
+8. In edit mode, verify the adaptive edit menu appears and the onboarding splash hides.
+9. In Edit/Transform, test left-click atoms and bond centers/ends, `Shift+click` atom toggles, empty-click clear, `Esc` clear, `Cmd/Ctrl+A`, inert right-click, and right-drag orbit from atoms/bonds/void. In Build, verify the same orbit-only right gestures with atom, fragment, and molecule payloads, including pending previews (`tests/e2e/build_orbit.py`).
+10. In edit mode, test the `Build` tool via button and `/`; confirm `/` opens or focuses the Build search field and that the `+` selection cue gates open-site build targets for selected atoms.
+11. In edit mode, test `Add > Atom`, `Add > Fragment`, and `Add > Molecule`, including the add-atom and add-molecule operator panels, Build-palette open/close behavior across mode switches, ghost-preview readability under the active molecule style, plus undo/redo and `Esc` cancel for molecule placement.
+12. In edit mode, press `Space` once on a simple unsaturated structure and verify ghost hydrogens appear without mutating the structure; press `Space` again and verify the hydrogens are added with one undoable history entry.
+13. In edit mode, test `Move` and `Rotate`: gizmo hover, operator-panel input commit, drag interaction, right-drag and `Shift+right-drag` scene rotation, and undo behavior on a selected atom set.
+14. In edit mode, test bond interactions: atom-to-atom create, Build left-click whole-bond order cycling `1 -> 2 -> 3 -> 4 -> 3 -> 2 -> 1`, Transform left-click scope selection, clicked-bond popup `1–4,0`, metal bond style popup `1/2/3/0`, `Clean Up Bonds`, and `Optimize Structure`.
+15. Load a `.2ccube` and verify the Appearance `2C mode` selector, centered `α` / `β` overlay labels, `Spinor info` popover, and phase wheel placement all react correctly when switching quantities and returning to `.cube`.
+16. In edit mode, test the `Symmetry` tool: open with button or `S`, preview one candidate, inspect a symmetry element in 3D, cancel/apply, and confirm Workbench keeps the panel across file changes, suspends it outside Edit, and clears unfinished candidates; the legacy popup closes on file/mode changes.
+17. Use `Save Structure`, then drag-drop the exported `vibemol.structure` file back into the app and verify explicit bond orders and metal bond styles survive round-trip.
+18. Open `View`, `Coordinates`, `Trajectory`, and `Frequencies`; verify orthographic toggle, COM/orientation actions, angstrom/bohr switching, inline coordinate edits, trajectory play/reset/frame/FPS/loop, and vibration mode/amplitude/speed/hide-small-frequencies behavior.
+19. Save/load a preset in web UI and verify settings round-trip, including `extensions.builder` when fragment operations exist.
+20. Load standard XYZ, coordinates-only XYZ, and pasted XYZ text; verify import succeeds for all supported XYZ forms.
+21. Run CLI with `--preset` and with `.vibemolrc` auto-discovery.
+22. Save PNG, export XYZ, and export cropped WebM from both Trajectory and Frequencies; check browser console for errors.
+
+## Deployment Notes
+- Main deployment target is static hosting from repository root (`index.html`).
+- `.nojekyll` must remain present for GitHub Pages compatibility.
+
+
+## Issue-backed cache inventory amendment
+
+Current completed Colors result: PR #23, CI 39039061120 attempt 1, **34/3/37** once, unchanged **102 × 2** captures/exact serialized repeat, zero diagnostic pixel changes, **52 slots × eight contexts** with every minimum, checks **433 JS/29 Python** and WebKit passed. #11 fired at **trajectory after the second download**; vibration export was not reached in Smoke. Looks completed both material paths in **1,951.74 s / 32.53 min**, no material-preset timeout; the risk remains open. Whole CI **2,018 s / 33.6333 min**, **74.70% less / 3.952×** against 132.93 min, eight cold-cache misses, critical Looks. App metrics **33,070 lines / 1,181 top-level function declarations / 265 tracked let declaration lines**; periodic factory **11 inputs**, all ten non-DOM inputs used. One subsequent whole-stage soak passed; source/test/golden bytes stay equal to the tested candidate during documentation-only final bookkeeping.
+
+Before its ordinary CI, Colors local verification completed: checks 433 JS/29 Python, four native layout/theme editor entry cases, 36 tagged/proposed direct periodic captures per source exactly equal, and 102 unchanged captures twice with exact serialized repeat and zero diagnostic pixel changes (1,033.61 s). All 52 slots in eight contexts met the fixed composition and current minima; actual presented 39/32, mode 408/9 (404/6 observer checks), panel 669–1064, DOM 2967–5430, restore 1 each. Its subsequent complete first-pass CI conjunction passed before the exact-head merge; the current completed result above is authoritative. Evidence: tests/baselines/evidence/stage3/colors/validation.json.
+
+The historical Element Colors proposal on codex/element-cache-colors (462050b) remains unused. Its fresh successor #23 was cut from pushed Symmetry integration 04e01ad and merged only after its own complete ordinary conjunction. The existing periodic factory is now **11 inputs**: ten used non-DOM inputs plus els; launcher exclusion gives the ungrouped count 18. #14 records the retired Workbench elementColorBtn. Native Panels → Properties → Look → Colors → Edit… opens the editor in both themes, and the original connected/wired button remains supported in both legacy themes. All fixed 52 identity slots remain; only Workbench excludes that retired launcher from its live set. Count arithmetic is explicit: 18 → 11, because ten non-DOM inputs plus els equals 11. No genuine input was removed/hidden and no extra controller/helper was introduced to claim ten.
+
+The historical b8baed5 census observed 2,215 module bindings and found 25 detached IDs (26 references) in Workbench. Many are deliberately retained legacy backing controls, not globally dead data. The remaining Atoms/Selection/Symmetry groups have no additional detached live nodes. Four old menu/fragment slots are null in both layouts, issue #15. Historical evidence: tests/baselines/evidence/stage3/cruft-sweep/. The fresh integration census inspected 2,188 lexical bindings, 296 direct literal-ID caches and 41 canonical els fields, again finding 25 retired IDs / 26 app references. An all-module startup query trace added 8 cached module/slider/listener IDs and 6 transient/wiring-only IDs: 39 removed-markup IDs total, with every use-site disposition recorded. All 33 cache IDs and 4 transient IDs were observed connected in legacy; two Workbench-only transient lookups were not queried there and retain an explicit source-inference limitation. See tests/baselines/evidence/stage3/colors/preflight/overlay-sweep.md.
+
+The current inventory splits live nodes and issue-backed known absences: **Workbench 47 live + 5 known-absent; legacy 48 live + 4 known-absent**, 52 slots in either layout. Every live node must exist and equal the private cache. Every absent slot must declare its issue and retained disposition, remain absent from live DOM, and retain its expected null or disconnected legacy node. Unexpected absence/presence, inventory drift and unexplained detachments are fatal and sticky. Characterization still requires all eight contexts and every firing minimum. The earlier 51 + 1 description would incorrectly count four already-absent nodes as live.
+
+This amendment originally resumed Selection after Atoms, then Symmetry/shared launcher, one PR each into pushed codex/app-js-decomposition. The released Stage 3 assignment is now complete; the historical sequence below preserves its acceptance requirements. No intermediate review is required; each new candidate merges only after its own unchanged candidate proves CI34/3/37 (the historical completed candidates below used the then-current34/3 policy), 102 goldens twice, the composed 52-slot identity sweep in eight contexts, all minima, reference-only changes and no newly introduced controller interface (the under-15 input limit applies to extractions). All stop decisions defer to the standing conversion rule in app.js Refactor Characterization above. The old held Colors proposal stays unused. Its fresh successor passed its own exact-candidate conjunction after the native/disposition/sweep prerequisites, and the one stage-boundary soak passed. No Stage4/PubChem or Stage5 implementation is authorized by this assignment.
+
+
+## Historical Atoms integration and Selection candidate
+
+Atoms PR #16 passed its own complete CI run 38266303089 (attempt 1), then merged as b517116b6d808a325d6e7348ef8eb7a266f51e9a. The local integration was fast-forwarded, verified byte-identical to the tested tree and pushed before Selection was cut. At that recorded point integrated lets were 288; Selection proposed 275 with 13 cache bindings plus the existing helper (14 inventory items, not controller dependencies) and line-neutral +178/−178 references. Selection subsequently passed its own rebased conjunction and merged; the current progress record above is authoritative.
+
+Atoms CI ran all 37 suites once: 34 passed, only the specified Escape, Coordinates Delete and #11 trajectory-after-second-download workflows failed; vibration was not reached. Both 102-capture runs matched unchanged goldens and repeated exactly. All 52 slots passed in eight contexts with the fixed issue-backed composition and every minimum; checks/unit and WebKit passed. The material-preset intermittent did not recur: both material_families paths completed, Looks took 32.08 minutes, full CI 170.48 minutes. The risk remained open for subsequent Selection/Symmetry checks and remains open after Colors. Evidence: tests/baselines/evidence/stage3/atoms/ci-38266303089/.
+
+Selection keeps editSelectionPositionUi as a controller let and preserves all original query/listener points and null guards. Use a heavier direct UI matrix for cue drag/position, coordination and metal menus, fragment/cancel, mode/focus/keyboard, both layouts/themes and responsive panels. Do not fix mode-consistency's covered Delete collision. At this historical checkpoint Element Colors was held, integrated inputs were 19, and the held proposal measured 11. The completed fresh hand-off above is the current result.
+
+Selection's new direct menu probe stopped on tagged 1c609b3, Workbench/light: the open Metal bond mode popover covered the Coordination cue click target. The proposed app was not reached by that probe. The user confirmed one-click switching is intended: this is pre-existing production UX defect #17. A measured desktop comparison found identical tagged/proposed rectangles and separate Metal-popover versus selection-card positioning functions. The authorized click-away workaround does not redefine correct product behavior. Raw evidence and the exact script are in tests/baselines/evidence/stage3/selection/manual-stop/. This was a historical pause; the 2026-10-15 standing rule resumes Selection then Symmetry without intermediate review. Local checks, two unchanged 102-capture runs and all eight 52-slot identity contexts passed. Four unchanged UI suites passed on the tagged base before this stop.
+
+## Selection verification resumed, then responsive stop
+
+The user authorized an explicit click-away before opening Coordination on both tagged/proposed source, with issue #17 cited inline. The original direct-switch probe is preserved. Direct one-click switching remains the intended behavior and remains broken; no production change is authorized. The original popover pointerdown propagation guards are correct and unchanged. Metal and the existing Coordinates Delete collision use different positioning functions, so #17 is separate and cross-linked from #4. Full rectangles for every sibling cue and the Coordinates Delete comparison are in tests/baselines/evidence/stage3/selection/overlay-geometry/. Tagged and proposed desktop measurements are exactly equal.
+
+The resumed tagged-base Workbench/light menu probe passed Coordination and all four Metal commits, then failed its unchanged 390px responsive bounds assertion: Metal x=12,width=386,right=398, an 8px overflow. It stopped before the proposed manual matrix. Record this second symptom in #17, preserve the failure and do not relax the assertion. This historical stop is superseded by the standing conversion rule above; preserve the failed assertion and its paired evidence. Evidence: tests/baselines/evidence/stage3/selection/manual-resumed-stop/.
+
+Count correction: Selection introduces no controller or dependency interface. The previously reported 14 sums 13 cache bindings and the already-existing helper; it is neither call-site count nor a count of modules, and it is not an extraction dependency count. Do not apply the under-15 extraction-input limit to a cache conversion group. At this historical checkpoint the held periodic-table factory was an actual dependency interface measured 19 → 11, with 19 integrated; the completed fresh hand-off now has 11 integrated inputs.
+
+The canonical carried-defect inventory is tests/baselines/carried-defects.json. Issue #17 is included without adding it to CI’s three accepted failing workflows. Closed test-synchronization issue #21 is removed from product priority; the relative order is #25 then #17. The complete census/overlay evidence remains recorded. The direct-human Stage 3 assignment is complete: fresh Colors hand-off, native/disposition/sweep proof, exact ordinary CI and one whole-stage soak have landed. Earlier held-proposal measurements remain historical, not an active assignment.
+
+## Closed #21 synchronization correction (2026-10-18)
+
+[Diagnostic39129507791](https://github.com/evangelistalab/vibemol/actions/runs/39129507791) measured tagged304/304 three times; integration442/12,442/12,304/304; held5c304/304,304/304,442/12. The failures read pre-compact desktop state at320px and subsequently recover. The human reclassified#21 as a closed harness synchronization defect. Restore34/3/37, keep the exact overflow comparison and comparand logging, and wait for observable compact readiness plus presentation. The separate presented-frame question is now closed as observed sub-frame: CI39133906847 recorded23 actual320×1000 frames across9cases, all compact, with no collapsed narrow frame. Harness-only PR29 passed its own first full CI39132743102 and merged/pushed as892922a. Unchanged5c then passed its own complete first new run39135895060 and merged/pushed as726079f; its original failed attempt remains failed. Do not re-cut5c or push the declined evidence branch. Historical33/4 results and old failed gates remain unchanged records.

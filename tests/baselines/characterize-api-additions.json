@@ -1,0 +1,5 @@
+{
+  "baseTag": "v0.10.0",
+  "purpose": "Published 0.10.0 CI goldens include all six extracted classic-script namespaces. No additive exception remains.",
+  "modules": []
+}
